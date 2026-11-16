@@ -1,64 +1,50 @@
 import React from 'react';
-import { Link } from 'react-router-dom';  
-import Header from "../../layout/Header"
-import Footer from "../../layout/Footer"
-const Services = () => {
-  return (
-    <>
-      <Header/>
-      <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center py-10">
-        <div className="text-center p-6 bg-white shadow-lg rounded-lg max-w-6xl w-full">
-          <h1 className="text-4xl font-bold text-green-800 mb-4">Our Services</h1>
-          <p className="text-lg text-gray-700 mb-8">
-            We provide a wide range of services designed to help you succeed. Below are the core services we offer.
-          </p>
+import { Link } from 'react-router-dom';
+import Page from '../../layout/Page';
 
-          {/* Service 1 */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-semibold text-green-600 mb-4">Consulting Services</h2>
-            <p className="text-lg text-gray-700">
-              Our consulting services are designed to help you navigate through complex challenges and achieve your business goals. 
-              We offer personalized solutions to meet your unique needs and ensure long-term success.
-            </p>
-          </div>
+const services = [
+  {
+    title: 'Easy browsing',
+    text: 'Products are grouped into Clothes, Electronics, Furniture, Shoes and Miscellaneous. Pick a category or type a name in the search box to narrow the list.',
+  },
+  {
+    title: 'Detailed product pages',
+    text: 'Every product has its own page with several photos, a description, the category, a star rating and the price.',
+  },
+  {
+    title: 'A cart that remembers',
+    text: 'Items you add stay in your cart after a reload because the cart is stored in your browser (localStorage). You can change quantities or remove items at any time.',
+  },
+  {
+    title: 'Demo checkout',
+    text: 'The checkout button shows how the flow ends without taking any payment. This is a portfolio demo, so no orders are shipped.',
+  },
+  {
+    title: 'Works on any screen',
+    text: 'The layout adapts from phones to large monitors, with a mobile menu on small screens.',
+  },
+];
 
-          {/* Service 2 */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-semibold text-green-600 mb-4">Product Development</h2>
-            <p className="text-lg text-gray-700">
-              We specialize in developing innovative products that meet the needs of your customers. Whether it's a physical product or a digital solution, we can bring your ideas to life.
-            </p>
-          </div>
-
-          {/* Service 3 */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-semibold text-green-600 mb-4">Digital Marketing</h2>
-            <p className="text-lg text-gray-700">
-              Our digital marketing team is here to help you grow your brand and reach your target audience. From SEO and social media marketing to paid advertising, we offer comprehensive strategies that deliver measurable results.
-            </p>
-          </div>
-
-          {/* Service 4 */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-semibold text-green-600 mb-4">Customer Support</h2>
-            <p className="text-lg text-gray-700">
-              We understand the importance of customer satisfaction. Our customer support team is here to assist you with any inquiries, troubleshooting, and post-sale support to ensure your experience with our products and services is exceptional.
-            </p>
-          </div>
-
-          {/* Service 5 */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-semibold text-green-600 mb-4">Training & Workshops</h2>
-            <p className="text-lg text-gray-700">
-              We offer professional training and workshops tailored to your industry. Whether you need team training or individual sessions, we provide hands-on education to help you and your team stay ahead in the market.
-            </p>
-          </div>
-          <Link to="/" className=" sm: text-xl font-bold m-[10%] text-white "> <button className='px-2 py-1 rounded-2xl bg-green-500 hover:text-amber-300 '>Back to All Product</button> </Link>
-        </div>
-      </div>
-     <Footer/>
-    </>
-  );
-};
+const Services = () => (
+  <Page title="Services">
+    <div className="max-w-5xl mx-auto">
+      <h1 className="text-3xl md:text-4xl font-bold text-green-800">What the store offers</h1>
+      <p className="mt-3 text-lg text-gray-700">
+        Our Boutique is a demo shop. These are the features you can try on this site.
+      </p>
+      <ul className="mt-8 grid gap-5 md:grid-cols-2">
+        {services.map(({ title, text }) => (
+          <li key={title} className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-green-700">{title}</h2>
+            <p className="mt-2 text-gray-700">{text}</p>
+          </li>
+        ))}
+      </ul>
+      <Link to="/" className="mt-8 inline-block px-5 py-2 rounded bg-green-700 text-white font-semibold hover:bg-green-800">
+        Back to all products
+      </Link>
+    </div>
+  </Page>
+);
 
 export default Services;
