@@ -1,24 +1,21 @@
 {
-  "name": "react-ecomerse",
+  "name": "ecommerse-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.14",
-    "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.4.0",
-    "react-toastify": "^11.0.5",
-    "router": "^2.1.0",
     "tailwindcss": "^4.0.14",
     "zustand": "^5.0.3"
   },
@@ -31,7 +28,6 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-    "json-server": "^1.0.0-beta.3",
     "vite": "^6.2.0"
   }
 }
