@@ -1,45 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { getCatalog } from '../../../api';
 
 const Categories = ({ activeCategory, setActiveCategory }) => {
-  const url = import.meta.env.VITE_BACKEND_URL;
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    axios.get(url)
-      .then(({ data }) => {
-        setCategories(data.categories);
-      })
-      .catch((err) => {
-        console.error('Error categories:', err);
-      });
-  }, [url]);
+    getCatalog()
+      .then((data) => setCategories(data.categories ?? []))
+      .catch((err) => console.error('Error loading categories:', err));
+  }, []);
+
+  const names = ['All', ...categories.map(({ name }) => name)];
 
   return (
-    <div className='pt-10'>
-      <h1 className='text-2xl text-white font-bold border border-green-800 rounded p-1 bg-green-800'>
+    <aside aria-labelledby="categories-heading">
+      <h2 id="categories-heading" className="text-xl font-bold text-white rounded p-2 bg-green-800">
         Categories
-      </h1>
-      <div className='flex flex-col'>
-        <div
-          className={`bg-green-800 p-1 m-1 rounded cursor-pointer text-xl ${activeCategory === "All" ? 'text-black' : 'text-amber-50'}`}
-          onClick={() => setActiveCategory("All")}
-        >
-          All
-        </div>
-
-        {/* Other categories */}
-        {categories.map(({ id, name }) => (
-          <div 
-            key={id}
-            className={`bg-green-800 p-1 m-1 rounded text-xl ${activeCategory === name ? 'text-black' : 'text-amber-50'}`}
-            onClick={() => setActiveCategory(name)}
-          >
-            {name}
-          </div>
+      </h2>
+      <ul className="mt-2 flex flex-wrap gap-2 lg:flex-col">
+        {names.map((name) => (
+          <li key={name}>
+            <button
+              type="button"
+              aria-pressed={activeCategory === name}
+              onClick={() => setActiveCategory(name)}
+              className={`w-full text-left px-3 py-1.5 rounded text-base ${
+                activeCategory === name ? 'bg-yellow-300 text-green-900 font-semibold' : 'bg-green-700 text-white hover:bg-green-600'
+              }`}
+            >
+              {name}
+            </button>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </aside>
   );
 };
 

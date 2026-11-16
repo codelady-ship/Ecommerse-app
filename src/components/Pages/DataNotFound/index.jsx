@@ -1,12 +1,9 @@
-import React from 'react'
+import React from 'react';
 
-const DataNotFound = () => {
-  return (
-    <div>
-      <p className="font-bold text-2xl text-green-800 ml-[35%]">DATA not Found</p>
-    </div>
-  )
-}
+const DataNotFound = () => (
+  <p className="my-10 text-center font-semibold text-xl text-green-800">
+    No products match your search. Try another name or category.
+  </p>
+);
 
-export default DataNotFound
-
+export default DataNotFound;

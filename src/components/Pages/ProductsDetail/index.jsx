@@ -1,118 +1,107 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../layout/Header';
-import Footer from '../../layout/Footer';
-import { useParams, Link } from 'react-router-dom';  
-import axios from 'axios';
+import { useParams, Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import Page from '../../layout/Page';
 import RatingStar from './RatingStar';
 import NotFound from '../Error404';
 import Loader from '../Loader';
 import UseBasket from '../Store/Basket';
+import { getCatalog } from '../../../api';
 
 const ProductsDetail = () => {
-  const { slug } = useParams();  // slug URL
-  const [product, setProduct] = useState(null);  // product details State 
-  const [currentImage, setCurrentImage] = useState("");  // image ucun State 
-  const [loading, setLoading] = useState(true);  // Loading state
-  const [isAddedBasket, setIsAddedBasket] = useState(false); // basket control
-  const {basket,addNewProduct} =UseBasket() //zustand
-  const url = import.meta.env.VITE_BACKEND_URL;
+  const { slug } = useParams();
+  const [product, setProduct] = useState(null);
+  const [currentImage, setCurrentImage] = useState('');
+  const [status, setStatus] = useState('loading'); // loading | ready | missing | error
+  const addToBasket = UseBasket((s) => s.addToBasket);
+  const inBasket = UseBasket((s) => s.basket.find((p) => p.id === product?.id)?.count ?? 0);
 
-  // useEffect
   useEffect(() => {
-    axios.get(url)
-      .then(({ data }) => {
-        const currentproduct = data.products.find((product) => product.slug === slug);
-        setProduct(currentproduct); // set product details
-        setCurrentImage(currentproduct.images[0]); // set default image 
-        basket.forEach(({id})=>{
-          currentproduct.id === id && setIsAddedBasket(true);// basket id sini tutsun
-        })
-        setLoading(false);  
-      });
-  }, [slug, url]); 
+    setStatus('loading');
+    getCatalog()
+      .then((data) => {
+        const found = data.products.find((p) => p.slug === slug);
+        if (!found) {
+          setStatus('missing');
+          return;
+        }
+        setProduct(found);
+        setCurrentImage(found.images[0]);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
+  }, [slug]);
 
-  // loading
-  if (loading) 
-    return (
-      <Loader/>
-    );
+  if (status === 'missing') return <NotFound />;
 
-  // not found
-  if (!product.slug) {
-    return <NotFound />;
-  }
-
-  // Basket function
-  // Basket funksiyası: Məhsulu səbətə əlavə etmək
-  function addBasket() {
-    // Basketdə mövcud məhsulu tapırıq
-    const existingProduct = basket.find(item => item.id === product.id);
-
-    if (existingProduct) {
-      // Əgər məhsul artıq səbətdə varsa, yalnız count artırılır
-      existingProduct.count += 1;
-      existingProduct.totalPrice = existingProduct.count * existingProduct.price;
-      // Basket yenilənir və localStorage-da saxlanır
-      localStorage.setItem("basket", JSON.stringify([...basket]));
-    } else {
-      // Əgər məhsul səbətdə yoxdursa, yeni məhsul əlavə olunur
-      const item = { ...product, count: 1, totalPrice: product.price };
-      addNewProduct(item); // Yeni məhsul əlavə edilir
-    }
-
-    setIsAddedBasket(true); // Məhsulun artıq səbətdə olduğunu göstəririk
-    console.log("Məhsul səbətə əlavə olundu:", product);
-  }
-
+  const handleAdd = () => {
+    addToBasket(product);
+    toast.success(`${product.title} added to cart`);
+  };
 
   return (
-    <div>
-      <Header />
-      <Link to="/" className=" sm: text-xl font-bold m-[10%] text-black lg:hidden"> 
-        <button className='my-5 px-2 py-1 text-amber-50 rounded-2xl bg-green-600 hover:text-amber-300 '>Back to All Product</button> 
+    <Page title={product?.title}>
+      <Link to="/" className="inline-block mb-4 text-green-800 font-semibold hover:underline">
+        ← Back to all products
       </Link>
-      <h1 className="text-3xl font-bold mx-[10%] mt-2 text-green-600"> About {product.title}</h1>
-      <div className="container px-auto py-5 sx:flex-wrap md:flex">
-        <div className='sm:grid-rows-1 gap-10 md:grid-rows-2 '> 
-          <img 
-            src={currentImage} 
-            alt={product.title} 
-            className="object-cover h-80 w-110 mb-1 ml-10 rounded-lg"  
-          /> 
-          <div className='grid grid-cols-[145px_145px_145px] gap-1 ml-10'>
-            {product.images?.map((image, index) => (
-              <img 
-                key={index} 
-                src={image} 
-                alt={`Product image ${index + 1}`} 
-                className='rounded-lg cursor-pointer' 
-                onClick={() => setCurrentImage(image)} 
-              />
-            ))}
-          </div>
-        </div>
-        <div className='ml-10 mt-5'>
-          <p className="text-gray-600 w-110 p-2 shadow-2xl overflow-hidden">{product.description}</p>
-          <h3 className="text-lg font-bold mt-5 text-gray-600">Category: {product.category.name}</h3>
-          <h2 className="text-xl font-bold text-green-800 mt-5">Price: ${product.price}</h2>
 
-          {/* Rating */}
-          <div className="mt-5">
-            <h4 className="font-semibold text-gray-800">Rate this product: </h4>
-            <RatingStar rating={product.rating} />
+      {status === 'loading' && <Loader />}
+      {status === 'error' && (
+        <p role="alert" className="text-red-700 font-semibold">This product could not be loaded. Please refresh the page.</p>
+      )}
+
+      {status === 'ready' && (
+        <article className="grid gap-8 md:grid-cols-2">
+          <div>
+            <img
+              src={currentImage}
+              alt={product.title}
+              className="w-full aspect-square object-cover rounded-lg"
+              width="600"
+              height="600"
+            />
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {product.images.map((image, index) => (
+                <button
+                  key={image}
+                  type="button"
+                  onClick={() => setCurrentImage(image)}
+                  aria-label={`Show image ${index + 1} of ${product.title}`}
+                  className={`rounded-lg overflow-hidden border-2 p-0 ${image === currentImage ? 'border-green-700' : 'border-transparent'}`}
+                >
+                  <img src={image} alt="" className="w-full aspect-square object-cover" loading="lazy" />
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Basket button */}
-          <button  
-            className={`px-2 py-1 mt-5 font-bold text-white rounded ${isAddedBasket ? "bg-red-600" : "bg-green-600"}`} 
-            onClick={addBasket}
-          >
-            {isAddedBasket ? "Added" : "+Add"} to basket
-          </button>
-        </div>
-      </div>
-      <Footer />
-    </div>
+          <div>
+            <h1 className="text-3xl font-bold text-green-800">{product.title}</h1>
+            <p className="mt-2 text-gray-600">Category: {product.category.name}</p>
+            <div className="mt-3">
+              <RatingStar rating={product.rating} />
+            </div>
+            <p className="mt-4 text-3xl font-bold text-green-800">${product.price}</p>
+            <p className="mt-4 text-gray-700 leading-relaxed">{product.description}</p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                className="px-5 py-2 font-bold text-white rounded bg-green-700 hover:bg-green-800"
+                onClick={handleAdd}
+              >
+                Add to cart
+              </button>
+              {inBasket > 0 && (
+                <Link to="/cart" className="text-green-800 font-semibold hover:underline">
+                  {inBasket} in cart. View cart →
+                </Link>
+              )}
+            </div>
+          </div>
+        </article>
+      )}
+    </Page>
   );
 };
 

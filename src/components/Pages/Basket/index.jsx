@@ -1,103 +1,97 @@
-import React, { useEffect, useState } from 'react';
-import Header from '../../layout/Header';
-import Footer from '../../layout/Footer';
-import UseBasket from '../Store/Basket';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify'; // ToastContainer və toast import edirik
-
+import { toast } from 'react-hot-toast';
+import Page from '../../layout/Page';
+import UseBasket, { basketCount, basketTotal } from '../Store/Basket';
 
 const Basket = () => {
-    const [basketTotal, setBasketTotal] = useState(0);
-    const { basket, changeCount, removeProduct } = UseBasket(); // zustand
+  const { basket, changeCount, removeProduct, clearBasket } = UseBasket();
+  const total = basketTotal(basket);
 
-    useEffect(() => {
-        let sum = 0;
-        basket.forEach(({ totalPrice }) => {
-            sum += totalPrice;
-        });
-        setBasketTotal(sum);
-    }, [basket]);
+  const handleRemove = (id, title) => {
+    removeProduct(id);
+    toast(`${title} removed from cart`);
+  };
 
-    // Toastify ilə silmə əməliyyatı
-    const handleRemoveProduct = (id) => {
-        // Toastify istifadə edərək istifadəçidən təsdiq soruşuruq
-        toast.warn('Are you sure you want to remove this item?', {
-            position: "top-center",
-            autoClose: 5000,
-            closeOnClick: false,
-            draggable: true,
-            progress: undefined,
-            onClose: () => {
-                removeProduct(id);
-            }
-        });
-    };
+  const handleCheckout = () => {
+    clearBasket();
+    toast.success('Demo checkout complete. This store takes no payments and ships nothing.', { duration: 5000 });
+  };
 
-    return (
-        <div>
-            <Header />
-            <h2 className="text-3xl font-bold ml-[45%] my-4 text-green-600">My Basket</h2>
+  return (
+    <Page title="Cart">
+      <h1 className="text-3xl font-bold text-green-800">My cart</h1>
 
-            {basket.length === 0 ? (
-                <p className="ml-[45%] my-4 text-red-600 ">Basket is empty</p>  // basket boş olarsa
-            ) : (
-                <div className="container py-4 px-[15%]">
-                    {basket.map(({ count, description, title, images, id, price }) => {
-                        // TotalPrice hər məhsul üçün doğru şəkildə hesablanır
-                        const totalPrice = price * count;
-
-                        return (
-                            <div key={id} className="border p-4 my-5">
-                                <div className="flex flex-col sm:flex-row sm:items-center lg:flex-wrap">
-                                    <img
-                                        src={images[0]} alt={title}
-                                        className="object-cover rounded lg:w-50 lg:mx-2"
-                                    />
-                                    <div className='ml-0 sm:ml-5 sm:w-1/2 lg:mb-13'>
-                                        <h3 className="font-semibold text-2xl">{title}</h3>
-                                        <p className=" text-2xl font-light overflow-hidden line-clamp-3 sm:w-50 md:w-60 lg:w-110 ">{description}</p>
-                                    </div>
-
-                                    <div className='flex flex-col gap-2 lg:mx-[-20px]'>
-                                        <p className="font-bold text-2xl text-green-800">Price: ${price}</p>
-
-                                        <p className="font-bold text-2xl text-black">Count: 
-                                            <button className="bg-green-600 text-white rounded-[50%] w-[30px] h-[30px] mx-2"
-                                                onClick={() => changeCount(id, "-")}>
-                                                -
-                                            </button>
-                                            {count}
-                                            <button className="bg-green-600 text-white rounded-[50%] w-[30px] h-[30px] ml-2"
-                                                onClick={() => changeCount(id, "+")}>
-                                                +
-                                            </button>
-                                        </p>
-
-                                        {/* Hesablanmış ümumi qiyməti göstəririk */}
-                                        <p className=" font-bold text-red-800 text-2xl">Total: ${totalPrice}</p>
-
-                                        {/* Məhsulu səbətdən silmək üçün ikon */}
-                                        <FaTrash className="text-3xl lg:ml-55 mt-5 text-red-600 cursor-pointer" onClick={() => handleRemoveProduct(id)} />
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    <div className="mt-5 flex justify-between">
-                        <button className="bg-green-600 text-white py-2 px-4 rounded"
-                        onClick={() => buyit(id)}>Buy now</button>
-                        <div className=" font-bold text-green-800 text-2xl"> Total: ${basketTotal}</div>
-                    </div>
-                </div>
-            )}
-
-            <Footer />
-            
-            {/* ToastContainer komponentini burda istifadə edirik */}
-            <ToastContainer className="w-100 h-100 p-15 mt-50"/>
+      {basket.length === 0 ? (
+        <div className="my-10 text-center">
+          <p className="text-lg text-gray-700">Your cart is empty.</p>
+          <Link to="/" className="mt-4 inline-block px-5 py-2 rounded bg-green-700 text-white font-semibold hover:bg-green-800">
+            Browse products
+          </Link>
         </div>
-    );
+      ) : (
+        <>
+          <ul className="mt-6 space-y-4">
+            {basket.map(({ id, title, slug, image, price, count }) => (
+              <li key={id} className="bg-white border rounded-lg p-4 flex flex-col sm:flex-row gap-4 sm:items-center">
+                <img src={image} alt={title} className="w-full sm:w-28 h-40 sm:h-28 object-cover rounded" loading="lazy" />
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg font-semibold">
+                    <Link to={`/products/${slug}`} className="hover:text-green-700">{title}</Link>
+                  </h2>
+                  <p className="text-gray-600">${price} each</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full bg-green-600 text-white disabled:opacity-40"
+                    onClick={() => changeCount(id, '-')}
+                    disabled={count <= 1}
+                    aria-label={`Decrease quantity of ${title}`}
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center font-semibold" aria-live="polite">{count}</span>
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full bg-green-600 text-white"
+                    onClick={() => changeCount(id, '+')}
+                    aria-label={`Increase quantity of ${title}`}
+                  >
+                    +
+                  </button>
+                </div>
+                <p className="sm:w-24 font-bold text-green-800 sm:text-right">${price * count}</p>
+                <button
+                  type="button"
+                  className="self-start sm:self-center p-2 text-red-600 hover:text-red-800"
+                  onClick={() => handleRemove(id, title)}
+                  aria-label={`Remove ${title} from cart`}
+                >
+                  <FaTrash size={20} aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-6 bg-white border rounded-lg p-4 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+            <p className="text-xl font-bold text-green-800">
+              Total ({basketCount(basket)} items): ${total}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" className="px-4 py-2 rounded border border-green-700 text-green-800" onClick={clearBasket}>
+                Clear cart
+              </button>
+              <button type="button" className="px-4 py-2 rounded bg-green-700 text-white font-semibold hover:bg-green-800" onClick={handleCheckout}>
+                Checkout (demo)
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </Page>
+  );
 };
 
 export default Basket;

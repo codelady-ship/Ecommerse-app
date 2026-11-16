@@ -1,125 +1,97 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { getCatalog } from '../../../api';
 import DataNotFound from '../DataNotFound';
 import Loader from '../Loader';
 
-const Products = ({ searchedText, activeCategory}) => {
-  const url = import.meta.env.VITE_BACKEND_URL;
+const PER_PAGE = 8;
+
+const Products = ({ searchedText, activeCategory }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const count = 4;
-  const [pages, setPages] = useState(0);
-  const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(count);
-  const [filteredDataProducts, setFilteredDataProducts] = useState([]);
   const [activePage, setActivePage] = useState(1);
 
-  // Data yükləmək
   useEffect(() => {
-    axios.get(url)
-      .then(({ data }) => {
-        if (data && data.products) {
-          setProducts(data.products);
-          setLoading(false);
-          setPages(Math.ceil(data.products.length / count)); // Toplam səhifə sayını hesablamaq
-        } else {
-          toast.error("No products found");
-        }
-      })
-      .catch(err => {
+    getCatalog()
+      .then((data) => setProducts(data.products ?? []))
+      .catch((err) => {
         console.error(err);
-        setError("An error occurred while fetching products.");
-        toast.error("Error loading products.");
-      });
-  }, [url]);
+        setError('Products could not be loaded. Please refresh the page.');
+        toast.error('Error loading products.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  // Pagination funksiyası
-  useEffect(() => {
-    setStartIndex((activePage - 1) * count);
-    setEndIndex(activePage * count);
-  }, [activePage]);
-
-  // Məhsul axtarışı
-  useEffect(() => {
-    let filteredData = products;
-
-    // `searchedText` ilə filtr
-    if (searchedText) {
-      filteredData = filteredData.filter(({ title }) =>
-        title.toLowerCase().includes(searchedText.toLowerCase())
-      );
-    }
-
-    // `activeCategory` ilə filtr
-    if (activeCategory && activeCategory !== 'All') {
-      filteredData = filteredData.filter(({ category }) =>
-        category.name.toLowerCase() === activeCategory.toLowerCase()
-      );
-    }
-
-    setPages(Math.ceil(filteredData.length / count));
-    setFilteredDataProducts(filteredData);
-    setActivePage(1); 
-  }, [searchedText, activeCategory, products]);
-
-  // Yüklənmə 
-  if (loading) {
-    return <Loader />;
-  }
-
-  // error 
-  if (error) {
-    return (
-      <div className="text-center text-red-600">
-        <h2>{error}</h2>
-      </div>
+  const filtered = useMemo(() => {
+    const text = searchedText?.trim().toLowerCase();
+    return products.filter(
+      ({ title, category }) =>
+        (!text || title.toLowerCase().includes(text)) &&
+        (activeCategory === 'All' || category.name === activeCategory)
     );
-  }
+  }, [products, searchedText, activeCategory]);
+
+  // Go back to page 1 whenever the filter changes.
+  useEffect(() => setActivePage(1), [searchedText, activeCategory]);
+
+  if (loading) return <Loader />;
+  if (error) return <p role="alert" className="text-center text-red-700 font-semibold py-10">{error}</p>;
+
+  const pages = Math.ceil(filtered.length / PER_PAGE);
+  const visible = filtered.slice((activePage - 1) * PER_PAGE, activePage * PER_PAGE);
 
   return (
-    <div className="flex flex-col items-center justify-between p-3">
-      <h1 className="text-4xl text-green-800 font-semibold pt-3">Products</h1>
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 my-6">
-          {filteredDataProducts.length > 0 ? (
-            filteredDataProducts
-              .slice(startIndex, endIndex)
-              .map(({ id, title, images, category, description, slug, price }) => (
-                <div key={id} className="relative border border-green-800 rounded-lg shadow-lg overflow-hidden">
-                  <img src={images[0]} className="object-cover h-70 w-full" alt={title} />
-                  <div className='p-2'>
-                    <h2 className="text-2xl font-semibold truncate">{title}</h2>
-                    <h1 className="absolute top-2 right-2 px-2 py-0.5 font-bold bg-green-800 text-white rounded">
-                      {category.name}
-                    </h1>
-                    <h2 className="my-2 line-clamp-2 text-sm text-gray-700">{description}</h2>
-                    <h2 className="font-extrabold text-green-800">Price: ${price}</h2>
-                  </div>
-                  <Link to={"/products/" + slug} className="absolute inset-0"></Link>
-                </div>
-              ))
-          ) : (
-            <DataNotFound />
-          )}
+    <section aria-labelledby="products-heading">
+      <h2 id="products-heading" className="text-2xl font-semibold text-green-800">
+        {activeCategory === 'All' ? 'All products' : activeCategory}
+        <span className="ml-2 text-base font-normal text-gray-600">({filtered.length})</span>
+      </h2>
 
-          {/* Pagination Component */}
-          <div className="sm: flex justify-center items-center gap-3 lg:ml-160">
-            {new Array(pages).fill("").map((_, index) => (
-              <button
-                key={index}
-                className={`px-2 py-1 rounded ${activePage === index + 1 ? 'bg-red-600 text-white' : 'bg-green-500 text-white'}`}
-                onClick={() => setActivePage(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      {visible.length === 0 ? (
+        <DataNotFound />
+      ) : (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 my-6">
+          {visible.map(({ id, title, images, category, description, slug, price }) => (
+            <li key={id} className="relative bg-white border border-green-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
+              <img src={images[0]} className="object-cover h-60 w-full" alt={title} loading="lazy" width="400" height="240" />
+              <span className="absolute top-2 right-2 px-2 py-0.5 text-sm font-bold bg-green-800 text-white rounded">
+                {category.name}
+              </span>
+              <div className="p-3">
+                <h3 className="text-lg font-semibold truncate">
+                  <Link to={`/products/${slug}`} className="after:absolute after:inset-0 hover:text-green-700">
+                    {title}
+                  </Link>
+                </h3>
+                <p className="my-2 line-clamp-2 text-sm text-gray-700">{description}</p>
+                <p className="font-extrabold text-green-800">${price}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {pages > 1 && (
+        <nav aria-label="Pagination" className="flex flex-wrap justify-center gap-2">
+          {Array.from({ length: pages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              type="button"
+              aria-current={activePage === page ? 'page' : undefined}
+              className={`min-w-9 px-2 py-1 rounded text-white ${activePage === page ? 'bg-green-900' : 'bg-green-600 hover:bg-green-700'}`}
+              onClick={() => {
+                setActivePage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              {page}
+            </button>
+          ))}
+        </nav>
+      )}
+    </section>
   );
 };
 

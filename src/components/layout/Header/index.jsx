@@ -1,98 +1,89 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { FaShoppingCart } from 'react-icons/fa';  // Sebet iconu
-import { HiOutlineMenuAlt3, HiX  } from 'react-icons/hi';  //menu icon 
-import UseBasket from '../../Pages/Store/Basket';
+import { FaShoppingCart } from 'react-icons/fa';
+import { HiOutlineMenuAlt3, HiX } from 'react-icons/hi';
+import UseBasket, { basketCount } from '../../Pages/Store/Basket';
 
-const Header = ({searchedText,setSearchedText}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
-const {basket} = UseBasket()
-  
-  const links = [
-    { id: 0, title: 'Home', href: '/' },
-    { id: 1, title: 'Contact', href: '/contact' },
-    { id: 2, title: 'About', href: '/about' },
-    { id: 3, title: 'Services', href: '/services' },
-  ];
+const links = [
+  { id: 0, title: 'Shop', href: '/' },
+  { id: 1, title: 'About', href: '/about' },
+  { id: 2, title: 'Services', href: '/services' },
+  { id: 3, title: 'Contact', href: '/contact' },
+];
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // Menu function
-  };
+const navClass = ({ isActive }) =>
+  `text-lg ${isActive ? 'text-yellow-300 underline underline-offset-4' : 'text-white'} hover:text-yellow-300`;
+
+// searchedText / setSearchedText are only passed on the shop page, so the search box only shows there.
+const Header = ({ searchedText, setSearchedText }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const count = UseBasket((s) => basketCount(s.basket));
+  const showSearch = typeof setSearchedText === 'function';
 
   return (
-    <div className="bg-green-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <div className="text-2xl font-bold">
-          <Link to="/">Our Boutigue</Link>
-        </div>
+    <header className="bg-green-800 text-white relative">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+        <Link to="/" className="text-2xl font-bold text-white hover:text-yellow-300 mr-auto">
+          Our Boutique
+        </Link>
 
-        {/* Basket Icon and Badge */}
-        <div className="relative">
-          <NavLink to="/cart">
-            <FaShoppingCart size={24} />
-            <span className="absolute top-[-10px] right-[-2px] text-xs bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
-             {basket.length}
-            </span>
-          </NavLink>
-        </div>
-        
-        {/*input search*/}
-        <input 
-          type="text" 
-          placeholder="Search" 
-          className="border-white-100 px-1 py-0.5 bg-emerald-600 text-black placeholder:text-white"
-          value={searchedText}
-          onChange={(e) => setSearchedText(e.target.value)}
-        />
-        
-        {/* Links */}
-        <div className="hidden md:flex space-x-6 ">
+        <nav aria-label="Main" className="hidden md:flex gap-6">
+          {links.map(({ id, title, href }) => (
+            <NavLink key={id} to={href} end className={navClass}>
+              {title}
+            </NavLink>
+          ))}
+        </nav>
+
+        <NavLink to="/cart" className="relative p-1 text-white hover:text-yellow-300" aria-label={`Cart, ${count} items`}>
+          <FaShoppingCart size={24} aria-hidden="true" />
+          <span className="absolute -top-2 -right-2 min-w-5 h-5 px-1 text-xs bg-red-500 text-white rounded-full flex items-center justify-center">
+            {count}
+          </span>
+        </NavLink>
+
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          className="md:hidden p-1 text-white"
+          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-menu"
+        >
+          {isMenuOpen ? <HiX size={30} /> : <HiOutlineMenuAlt3 size={30} />}
+        </button>
+
+        {showSearch && (
+          <div className="w-full md:w-auto md:order-none">
+            <label htmlFor="search" className="sr-only">Search products</label>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search products"
+              className="w-full md:w-64 rounded px-3 py-1.5 bg-white text-gray-900 placeholder:text-gray-500"
+              value={searchedText}
+              onChange={(e) => setSearchedText(e.target.value)}
+            />
+          </div>
+        )}
+      </div>
+
+      {isMenuOpen && (
+        <nav id="mobile-menu" aria-label="Mobile" className="md:hidden border-t border-green-700 bg-green-800 px-4 pb-4">
           {links.map(({ id, title, href }) => (
             <NavLink
               key={id}
               to={href}
-              className={({ isActive }) =>
-                `text-xl ${isActive ? 'text-black' : 'text-white'} hover:text-yellow-300`
-              }
+              end
+              onClick={() => setIsMenuOpen(false)}
+              className={(state) => `block py-2 ${navClass(state)}`}
             >
               {title}
             </NavLink>
           ))}
-        </div>
-        {/*mobil menu*/}
-        {isMenuOpen && (
-        <div className="md:hidden absolute top-17 right-0 w-50 px-10 py-5 bg-green-800 z-1 ">
-          <div className="space-y-4">
-            {links.map(({ id, title, href }) => (
-              <NavLink
-                key={id}
-                to={href}
-                className={({ isActive }) =>
-                  `block text-xl ${isActive ? 'text-black' : 'text-white'} hover:text-yellow-300`
-                }
-              >
-                {title}
-              </NavLink>
-            ))}
-          </div>
-        </div>
+        </nav>
       )}
-
-        {/* Hamburger Icon (Mobile View) */}
-        <div className="md:hidden sx:block">
-          <button onClick={toggleMenu} className="text-white">
-           
-          {isMenuOpen ? (
-              <HiX size={30} /> //x iconu
-            ) : (
-              <HiOutlineMenuAlt3 size={30} /> // hamburger icon
-            )}
-          </button>
-        </div>
-      </div>  
-        
-      </div>
+    </header>
   );
 };
 
