@@ -25,6 +25,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # Optional: Settings > Secrets and variables > Actions > Variables > VITE_API_BASE_URL
+          # (e.g. https://hueline-api.onrender.com). Empty = demo mode with the bundled catalogue.
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
