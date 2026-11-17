@@ -2252,3 +2252,87 @@ html.has-cursor textarea {
     height: 70svh;
   }
 }
+
+/* ---------------------------------------------------------------- touch targets + legibility
+   Every tap target is at least 44x44 px and no text is smaller than 12 px. Where a bigger box would
+   push the layout around, the box grows with padding and a matching negative margin, so the design
+   looks the same and only the tappable area changes. */
+.mono,
+.mono-label,
+.link-btn,
+.tab,
+.nav-links a,
+.nav-btn,
+select,
+.field label,
+.cursor-label {
+  font-size: 12px;
+}
+.count {
+  min-width: 22px;
+  height: 22px;
+  font-size: 12px;
+}
+.skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.nav-links a,
+.nav-btn {
+  min-width: 44px;
+  justify-content: center;
+}
+.tab,
+select {
+  min-height: 44px;
+}
+.footer-cols ul {
+  gap: 0;
+}
+.footer-cols a,
+.footer-cols .link-btn {
+  min-height: 44px;
+}
+.details summary {
+  min-height: 44px;
+}
+.swatch-dot {
+  width: 44px;
+  height: 44px;
+}
+.card-hit {
+  padding-block: 12px;
+  margin-block: -12px;
+}
+.link-arrow {
+  border-bottom: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  padding: 15px 0;
+  margin: -15px 0;
+}
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block: -13px;
+}
+.thumb {
+  min-width: 44px;
+}
+.footer-cols a,
+.crumbs a {
+  min-width: 44px;
+}
