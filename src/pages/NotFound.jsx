@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDocumentMeta } from '../lib/meta.js';
 
 export default function NotFound() {
-  useDocumentMeta({ title: 'Page not found · Hueline', description: 'This page does not exist.', path: '/404' });
+  useDocumentMeta({ title: 'Page not found · Hueline', description: 'This page does not exist.', path: '/404', noindex: true });
   return (
     <section className="section notfound" aria-labelledby="nf-title">
       <p className="mono-label">404</p>

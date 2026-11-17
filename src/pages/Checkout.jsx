@@ -17,7 +17,13 @@ const FIELDS = [
 ];
 
 export default function Checkout() {
-  useDocumentMeta({ title: 'Checkout · Hueline', description: 'Demo checkout for the HUELINE portfolio shop. No payment is taken.', path: '/checkout' });
+  useDocumentMeta({
+    title: 'Demo checkout · Hueline',
+    description:
+      'Demo checkout for the HUELINE Saturation SS27 portfolio shop. Fill in the form to see a demo order confirmation; no payment is taken and nothing ships.',
+    path: '/checkout',
+    noindex: true,
+  });
   const products = useCatalog((s) => s.products);
   const { bag, clearBag } = useLists();
   const [form, setForm] = useState(() => Object.fromEntries(FIELDS.map((f) => [f.name, ''])));
@@ -55,7 +61,9 @@ export default function Checkout() {
   if (order) {
     return (
       <section className="section checkout done" aria-labelledby="co-done">
-        <p className="mono-label">Order {order.number}</p>
+        <p className="mono-label" role="status">
+          Demo order {order.number} · no payment taken
+        </p>
         <h1 id="co-done" className="display">
           Thank you, <em>{order.customer.name.split(' ')[0]}</em>.
         </h1>
