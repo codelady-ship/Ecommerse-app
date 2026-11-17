@@ -117,7 +117,11 @@ export default function Footer() {
       <div className="footer-small">
         <p>
           <strong>Portfolio demo project.</strong> HUELINE is a fictional label made to show front-end and API work. Nothing here
-          is for sale, no payments are taken and no orders are shipped. Photos: CC0 from StockSnap (see docs/CREDITS.md).
+          is for sale, no payments are taken and no orders are shipped. Photos: CC0 from StockSnap; films: Pexels (Pexels License).{' '}
+          <a href="https://github.com/codelady-ship/Ecommerse-app/blob/main/docs/CREDITS.md" target="_blank" rel="noreferrer">
+            Credits
+          </a>
+          .
         </p>
         <p>© {new Date().getFullYear()} codelady-ship · Built with React, GSAP, Lenis, Express and MongoDB</p>
       </div>

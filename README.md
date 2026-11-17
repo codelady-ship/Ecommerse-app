@@ -31,7 +31,10 @@ bag, saved list, demo checkout and newsletter. **It is a demo: nothing is for sa
 | Checkout | `/checkout`: validated form, server-side prices, demo order confirmation |
 
 Also: custom cursor (hidden on touch), magnetic buttons, `prefers-reduced-motion` support (no loader, no pinning, Flip at 0 s),
-responsive from 390 px to 1920 px without horizontal scroll, per-route title/description/canonical/OG tags, `robots.txt`, `sitemap.xml`.
+responsive from 360 px to 1920 px without horizontal scroll, 44 px touch targets and 12 px minimum text, per-route
+title/description/canonical/OG tags, JSON-LD (Organization + WebSite, an ItemList of the shop on the home page, Product +
+BreadcrumbList on product pages; no offers or ratings because nothing is for sale), `robots.txt`, `sitemap.xml`, `llms.txt`,
+width/height on every photo and a preloaded hero poster.
 
 ## Architecture
 
@@ -90,4 +93,5 @@ GitHub Actions · GitHub Pages · Render
 ## Credits
 
 Photos are CC0 images from StockSnap, listed with their photographers in [docs/CREDITS.md](docs/CREDITS.md).
-No video files are shipped; the film slots show their poster photos. HUELINE, its products and its people are fictional.
+The four film slots play free Pexels clips (Pexels License, also credited in docs/CREDITS.md); with reduced motion
+they show their poster photos. HUELINE, its products and its people are fictional.

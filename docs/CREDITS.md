@@ -1,4 +1,4 @@
-# Image credits
+# Image and film credits
 
 HUELINE is a fictional label made for a portfolio project. Every photo in `public/assets/` is a
 [CC0 1.0 (public domain)](https://creativecommons.org/publicdomain/zero/1.0/) photo from
@@ -7,8 +7,24 @@ resized to 960 px wide and re-encoded as WebP (each file is 200 KB or less). CC0
 the photographers are credited here anyway. The people in the photos are not wearing HUELINE products and do not
 endorse this project. `public/og-image.jpg` is a crop of `hero-poster`.
 
-No video files are shipped. The spec's hero film, close-ups and dye-yard film fall back to these photos and to
-dye-colour blocks (see `src/data/catalog.js`, `LOCAL.hasVideo`).
+## Films
+
+The four film slots (`src/data/catalog.js`, `LOCAL_VIDEOS`) play free stock clips from
+[Pexels](https://www.pexels.com), used under the [Pexels License](https://www.pexels.com/license/) (free to
+use, attribution not required, credited here anyway). Each file is Pexels' own smallest suitable H.264 MP4
+rendition, unchanged (no audio is played: the videos are muted), and 3 MB or less. The people in the clips are
+not wearing HUELINE products and do not endorse this project. Visitors who prefer reduced motion see the
+poster photo instead of the film.
+
+| File | Size | Clip | Creator | Licence |
+| --- | --- | --- | --- | --- |
+| `hero-main.mp4` | 1280x720, 3 s, 1.1 MB | [A Woman Walking Towards the Camera](https://www.pexels.com/video/a-woman-walking-towards-the-camera-5385819/) | Polina Tankilevitch | Pexels License |
+| `hero-close-1.mp4` | 540x960, 10 s, 1.9 MB | [Woman Wearing a Beautiful Dress](https://www.pexels.com/video/woman-wearing-a-beautiful-dress-9347912/) | Anna Pou | Pexels License |
+| `hero-close-2.mp4` | 540x960, 7 s, 1.9 MB | [Portrait of a Woman Outdoors in Orange Dress](https://www.pexels.com/video/portrait-of-a-woman-outdoors-in-orange-dress-37910230/) | Olumide Adekunle | Pexels License |
+| `dye-yard.mp4` | 640x360, 19 s, 1.2 MB | [Woman Picking Out Clothes](https://www.pexels.com/video/woman-picking-out-clothes-853800/) | Coverr | Pexels License |
+
+## Photos
+
 
 | File | Size | Source | Photographer | Licence |
 | --- | --- | --- | --- | --- |
