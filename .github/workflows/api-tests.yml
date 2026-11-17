@@ -1,0 +1,24 @@
+name: API tests
+
+# Runs the backend supertest suite (in-memory MongoDB) on every pull request and on pushes to main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths: ['backend/**', '.github/workflows/api-tests.yml']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
