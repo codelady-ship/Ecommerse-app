@@ -1,54 +1,93 @@
-# Our Boutique: React e-commerce demo
+# HUELINE · Saturation SS27
 
-[![Live demo](https://img.shields.io/badge/live-codelady--ship.github.io%2FEcommerse--app-166534?logo=github)](https://codelady-ship.github.io/Ecommerse-app/)
+[![Live demo](https://img.shields.io/badge/live-codelady--ship.github.io%2FEcommerse--app-2b3fd6?logo=github)](https://codelady-ship.github.io/Ecommerse-app/)
 [![Deploy](https://github.com/codelady-ship/Ecommerse-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/codelady-ship/Ecommerse-app/actions/workflows/deploy.yml)
+[![API tests](https://github.com/codelady-ship/Ecommerse-app/actions/workflows/api-tests.yml/badge.svg)](https://github.com/codelady-ship/Ecommerse-app/actions/workflows/api-tests.yml)
 
-A small online store built with React. You can browse 41 sample products, filter them by category, search by name,
-open a product page with a photo gallery and keep a shopping cart that survives page reloads. It is a front-end
-portfolio project: the checkout and the contact form are demos and send nothing.
+A fashion lookbook and shop for **HUELINE**, a fictional womenswear label, built as a full-stack portfolio project:
+a motion-heavy React front end (GSAP ScrollTrigger + Flip, Lenis) and a Node/Express + MongoDB API for the catalogue,
+bag, saved list, demo checkout and newsletter. **It is a demo: nothing is for sale and no payments are taken.**
 
-> AZ: React ilə hazırlanmış demo onlayn mağaza: kateqoriya filtri, axtarış, məhsul səhifələri və brauzerdə saxlanan səbət.
+> AZ: Uydurma moda brendi üçün React + GSAP ilə hazırlanmış lookbook və mağaza, Express + MongoDB API ilə (səbət, seçilmişlər, demo sifariş, çatdırılma hesablaması). Portfolio layihəsidir, real ödəniş yoxdur.
 
-![Our Boutique home page](docs/screenshot.png)
+![HUELINE home page: "Wear the colour out loud" over the hero photo](docs/screenshot.jpg)
 
-## Features
+## What is on the page
 
-- Product catalogue loaded from a static JSON file (`public/data.json`)
-- Category filter, live search and pagination (8 products per page)
-- Product detail pages at `/products/:slug` with an image gallery and star rating
-- Cart with add, quantity +/-, remove, clear and a demo checkout, persisted to `localStorage` with Zustand
-- Contact form with client-side validation and a demo confirmation toast
-- Responsive layout with a mobile menu, from 390 px phones to 1920 px screens
-- SEO basics: title, meta description, canonical, Open Graph/Twitter tags, `robots.txt`, `sitemap.xml`
+| Section | What it does |
+| --- | --- |
+| Loader | Five dye bands rise while a counter runs 000 → 100, then lift away from the centre and hand over to the hero |
+| Hero | Pinned; the film opens up on load, then narrows into an arch while two close-ups rise beside it |
+| Ticker | Endless line of styles and dyes |
+| Six styles | Arched gallery that wipes in and drifts at six speeds; a click filters the shop |
+| Wardrobe ring | 3D concave cylinder of 14 cards: drifts, follows scroll velocity, drags (pointer or ← →), caption follows the front card |
+| Style rails | One endless rail per style: drift, pause on hover, drag, fling with momentum |
+| Lookbook | Pinned horizontal scroll through six looks (vertical stack on phones) |
+| Colour story | The whole section repaints dye by dye as each swatch crosses the middle of the screen |
+| Shop | Style tabs, sort, "show all", every change animated with GSAP Flip |
+| Film band, Atelier | Widening frame; counters that count up |
+| Product page | `/product?code=HL-T-01`: gallery with click-to-zoom, colourways, sizes + size chart, add to bag, save, pincode delivery check |
+| Overlays | Bag/Saved drawer, search, quick view, mobile menu; focus trap, Escape, scroll lock, focus return |
+| Checkout | `/checkout`: validated form, server-side prices, demo order confirmation |
 
-## Tech stack
+Also: custom cursor (hidden on touch), magnetic buttons, `prefers-reduced-motion` support (no loader, no pinning, Flip at 0 s),
+responsive from 390 px to 1920 px without horizontal scroll, per-route title/description/canonical/OG tags, `robots.txt`, `sitemap.xml`.
 
-React 19 · React Router 7 · Zustand 5 · Tailwind CSS 4 · Vite 6 · react-hot-toast · react-icons · GitHub Actions + GitHub Pages
+## Architecture
+
+```
+src/                      React 19 + Vite app (GitHub Pages)
+  data/catalog.js         ASSETS / VIDEOS lists, src() helper, views, dyes, sizes (window.HL)
+  lib/api.js              API client: 8 s timeout, falls back to demo mode when the API is missing or down
+  lib/store.js            Zustand: catalogue, bag + saved (localStorage, synced to the API), overlays
+  lib/motion.js           GSAP, ScrollTrigger, Flip, Lenis setup and reveal helpers
+  sections/ pages/ components/
+backend/                  Express 5 + Mongoose API (Render)
+  src/data/catalog.json   the 24 products, 6 styles, 9 colours: single source for the seed AND the front end
+  src/lib/delivery.js     delivery rules, shared with the front end
+  test/api.test.js        25 supertest tests on an in-memory MongoDB
+render.yaml               Render Blueprint for the API
+```
+
+The front end works on its own: without `VITE_API_BASE_URL` (or when the API does not answer within 8 s) it uses the
+bundled catalogue, local delivery rules and `localStorage`, so the GitHub Pages site always works.
 
 ## Run locally
 
 ```bash
-git clone https://github.com/codelady-ship/Ecommerse-app.git
-cd Ecommerse-app
+# front end
 npm install
-npm run dev      # http://localhost:5173/Ecommerse-app/
-npm run build    # production build in dist/ (also writes dist/404.html for SPA routes)
-npm run preview  # serve the production build
-```
+npm run dev            # http://localhost:5173/Ecommerse-app/
+npm run build          # dist/ (also writes dist/404.html for deep links)
 
-No environment variables are needed (see `.env.example`).
+# API (optional, needs MongoDB; see backend/README.md)
+cd backend
+npm install
+cp .env.example .env   # set MONGODB_URI and JWT_SECRET
+npm run seed
+npm run dev            # http://localhost:4000/api/health
+npm test               # supertest suite, downloads an in-memory MongoDB the first time
+
+# point the front end at it
+echo VITE_API_BASE_URL=http://localhost:4000 > .env.local
+```
 
 ## Deployment
 
-`vite.config.js` sets `base: '/Ecommerse-app/'` and the router uses `basename={import.meta.env.BASE_URL}`, so a fresh
-build from `main` matches the live site. The workflow in `.github/workflows/deploy.yml` runs on every push to `main`:
-it builds the app and publishes `dist/` to the `gh-pages` branch, which GitHub Pages serves.
-`dist/404.html` is a copy of `index.html`, so deep links such as `/products/<slug>` load the app.
+- **Front end:** every push to `main` runs `.github/workflows/deploy.yml`, which builds and publishes `dist/` to the
+  `gh-pages` branch. To use the live API, add a repository variable `VITE_API_BASE_URL`
+  (Settings → Secrets and variables → Actions → Variables) and re-run the workflow.
+- **API:** Render → New → Blueprint → this repo (uses `render.yaml`). Fill in `MONGODB_URI` (for example a free
+  MongoDB Atlas M0 cluster), `ADMIN_EMAIL`, `ADMIN_PASSWORD` and optionally `CLOUDINARY_URL`. The database is seeded on
+  first boot. Free Render services sleep when idle; the front end falls back to demo data while the API wakes up.
 
-## What I learned
+## Tech stack
 
-- Static files that the app fetches belong in `public/` and must be requested with `import.meta.env.BASE_URL`;
-  relative paths like `../../data.json` break as soon as the app is served from a sub-path.
-- Commit the deploy config (`base`, `basename`, workflow) so the live site can be rebuilt from the repo.
-- Zustand's `persist` middleware is a simpler and safer way to sync state with `localStorage` than writing to it by hand.
-- Never commit `.env`; commit `.env.example` instead.
+React 19 · React Router 7 · Zustand 5 · GSAP 3.12.5 (ScrollTrigger, Flip) · Lenis 1.1.13 · Vite 6 ·
+Node 22 · Express 5 · Mongoose 8 · zod · JWT · multer · helmet · express-rate-limit · node:test + supertest ·
+GitHub Actions · GitHub Pages · Render
+
+## Credits
+
+Photos are CC0 images from StockSnap, listed with their photographers in [docs/CREDITS.md](docs/CREDITS.md).
+No video files are shipped; the film slots show their poster photos. HUELINE, its products and its people are fictional.

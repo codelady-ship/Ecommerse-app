@@ -1,37 +1,61 @@
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import Nav from './components/Nav.jsx';
+import Footer from './components/Footer.jsx';
+import Cursor from './components/Cursor.jsx';
+import { Drawer, QuickView, Search, Toast } from './components/Overlays.jsx';
+import Home from './pages/Home.jsx';
+import Product from './pages/Product.jsx';
+import Checkout from './pages/Checkout.jsx';
+import NotFound from './pages/NotFound.jsx';
+import { initLenis, ScrollTrigger, scrollToTop } from './lib/motion.js';
+import { startListSync, useCatalog, useUI } from './lib/store.js';
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+export default function App() {
+  const { pathname, search } = useLocation();
 
-import Home from './components/Pages/Home';
-import Basket from './components/Pages/Basket';
-import About from './components/Pages/About';
-import Contact from './components/Pages/Contact';
-import Services from './components/Pages/Services';
-import NotFound from './components/Pages/Error404';
-import ProductsDetail from './components/Pages/ProductsDetail';
+  useEffect(() => {
+    initLenis();
+    useCatalog.getState().load();
+    const stop = startListSync();
+    // Any [data-product] element opens the quick view.
+    const onClick = (e) => {
+      const el = e.target instanceof Element ? e.target.closest('[data-product]') : null;
+      if (!el || e.defaultPrevented) return;
+      e.preventDefault();
+      useUI.getState().open('quick', { quickCode: el.getAttribute('data-product') });
+    };
+    document.addEventListener('click', onClick);
+    return () => {
+      stop();
+      document.removeEventListener('click', onClick);
+    };
+  }, []);
 
-const App = () => {
-  
-  const routes = [
-      { id: 0, path: "/", element: <Home /> },
-      { id: 1, path: "/products/:slug", element: <ProductsDetail /> },
-      { id: 2, path: "/about", element: <About /> },
-      { id: 3, path: "/contact", element: <Contact /> },
-      { id: 4, path: "/services", element: <Services /> },
-      { id: 5, path: "/cart", element: <Basket /> },
-      { id: 6, path: "*", element: <NotFound /> },
-    ];
-  
+  useEffect(() => {
+    scrollToTop();
+    useUI.getState().close();
+    const t = setTimeout(() => ScrollTrigger.refresh(), 300);
+    return () => clearTimeout(t);
+  }, [pathname, search]);
+
   return (
-     <>
-     <Routes>
-      {routes.map(({ id, path, element }) => (
-        <Route key={id} path={path} element={element} />
-      ))}
-    </Routes>
-       
-      </>
+    <>
+      <Nav />
+      <main id="main" tabIndex={-1}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/product" element={<Product />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <Footer />
+      <Drawer />
+      <Search />
+      <QuickView />
+      <Toast />
+      <Cursor />
+    </>
   );
-};
-
-export default App;
+}

@@ -1,0 +1,69 @@
+{
+  "palette": [
+    { "name": "Orchid", "hex": "#c2378a" },
+    { "name": "Cobalt", "hex": "#2b3fd6" },
+    { "name": "Marigold", "hex": "#f0a21a" },
+    { "name": "Lagoon", "hex": "#13807a" },
+    { "name": "Plum", "hex": "#3b1f3a" },
+    { "name": "Poppy", "hex": "#e46d2f" },
+    { "name": "Indigo", "hex": "#3a4a7a" },
+    { "name": "Chalk", "hex": "#d9d6cf" },
+    { "name": "Ink", "hex": "#16141a" }
+  ],
+  "styles": [
+    {
+      "code": "T", "label": "Tailoring", "tint": "#2b3fd6", "cover": "look-01",
+      "items": [
+        ["Cobalt wrap overcoat", "Double-faced cashmere", 62000, "Cobalt", ["look-01"]],
+        ["Cobalt trouser suit", "Super 120s wool", 54000, "Cobalt", ["p-t-02"]],
+        ["Marigold soft blazer", "Linen-silk, 210 g/m²", 33500, "Marigold", ["p-t-03"]],
+        ["Chalk belted trench", "Cotton gabardine", 41000, "Chalk", ["p-t-04"]]
+      ]
+    },
+    {
+      "code": "S", "label": "Streetwear", "tint": "#13807a", "cover": "mood-street",
+      "items": [
+        ["Dyed loop-back hoodie", "Organic cotton, 420 g/m²", 9800, "Lagoon", ["mood-street"]],
+        ["Lagoon fleece set", "Brushed fleece", 10500, "Lagoon", ["look-04"]],
+        ["Orchid boxy tee", "Combed cotton, 240 g/m²", 4200, "Orchid", ["p-s-03"]],
+        ["Poppy cargo trouser", "Ripstop cotton", 12800, "Poppy", ["p-s-04"]]
+      ]
+    },
+    {
+      "code": "E", "label": "Evening", "tint": "#c2378a", "cover": "mood-evening",
+      "items": [
+        ["Bias-cut slip dress", "Mulberry silk, 19 momme", 29000, "Orchid", ["look-02"]],
+        ["Cobalt column gown", "Silk crepe de chine", 48000, "Cobalt", ["p-e-02"]],
+        ["Orchid halter dress", "Silk satin", 36500, "Orchid", ["mood-evening"]],
+        ["Plum draped midi", "Silk georgette", 31500, "Plum", ["p-e-04"]]
+      ]
+    },
+    {
+      "code": "K", "label": "Knitwear", "tint": "#f0a21a", "cover": "look-03",
+      "items": [
+        ["Marigold cardigan set", "Lambswool", 16800, "Marigold", ["look-03"]],
+        ["Orchid ribbed crewneck", "Merino, 12 gauge", 14500, "Orchid", ["p-k-02"]],
+        ["Lagoon fine-knit polo", "Cotton-silk", 11200, "Lagoon", ["p-k-03"]],
+        ["Chalk cable vest", "Undyed alpaca", 13900, "Chalk", ["p-k-04"]]
+      ]
+    },
+    {
+      "code": "R", "label": "Resort", "tint": "#e46d2f", "cover": "mood-resort",
+      "items": [
+        ["Block-print shirt dress", "Hand-block cotton voile", 18500, "Poppy", ["look-05", "mood-resort"]],
+        ["Marigold tiered sundress", "Cotton mulmul", 15500, "Marigold", ["p-r-02"]],
+        ["Lagoon tiered maxi", "Cotton voile", 17200, "Lagoon", ["p-r-03"]],
+        ["Chalk wide-leg set", "Linen, 180 g/m²", 21000, "Chalk", ["p-r-04"]]
+      ]
+    },
+    {
+      "code": "D", "label": "Denim", "tint": "#3a4a7a", "cover": "mood-denim",
+      "items": [
+        ["Indigo trucker jacket", "Indigo + cobalt overdye", 17900, "Indigo", ["look-06"]],
+        ["Straight selvedge jean", "14 oz selvedge", 14900, "Indigo", ["mood-denim"]],
+        ["Rinse wide-leg jean", "12 oz organic denim", 13500, "Indigo", ["p-d-03"]],
+        ["Overdyed shirt dress", "Indigo chambray", 16200, "Cobalt", ["p-d-04"]]
+      ]
+    }
+  ]
+}
