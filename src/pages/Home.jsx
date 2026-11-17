@@ -13,7 +13,9 @@ import FilmBand from '../sections/FilmBand.jsx';
 import Atelier from '../sections/Atelier.jsx';
 import { gsap, revealWithin, ScrollTrigger, scrollToId } from '../lib/motion.js';
 import { reducedMotion } from '../lib/format.js';
-import { useDocumentMeta } from '../lib/meta.js';
+import { absolute, SITE, useDocumentMeta, useJsonLd } from '../lib/meta.js';
+import { src } from '../data/catalog.js';
+import { useCatalog } from '../lib/store.js';
 
 let loaderPlayed = false; // the loader runs once per page load, not on every return to the home route
 
@@ -25,10 +27,34 @@ export default function Home() {
   const [style, setStyle] = useState('ALL');
 
   useDocumentMeta({
-    title: 'Hueline Saturation SS27',
+    title: 'Hueline SS27 · Hand-Dyed Womenswear Lookbook & Shop',
     description:
-      'HUELINE Saturation SS27: a fictional womenswear lookbook and shop. Six silhouettes, twelve hand-mixed dyes, a 3D wardrobe ring, colour story and Flip-animated shop. Portfolio demo.',
+      'HUELINE Saturation SS27: a fictional hand-dyed womenswear lookbook and shop with six silhouettes, twelve dyes and 24 pieces. Portfolio demo, no real payments.',
     path: '/',
+  });
+
+  // The pieces listed in the shop section (names, colours, fabrics and photos are all on the page).
+  const products = useCatalog((s) => s.products);
+  useJsonLd('home-shop', {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'HUELINE Saturation SS27 collection',
+    url: `${SITE}/#shop`,
+    numberOfItems: products.length,
+    itemListElement: products.map((p, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Product',
+        name: p.name,
+        sku: p.code,
+        color: p.colour,
+        material: p.fabric,
+        category: p.styleLabel,
+        image: absolute(src(p.images[0])),
+        brand: { '@type': 'Brand', name: 'HUELINE' },
+      },
+    })),
   });
 
   const onHandover = useCallback(() => {

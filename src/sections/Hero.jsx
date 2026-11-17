@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Film } from '../components/Media.jsx';
 import { Chars } from '../components/Text.jsx';
 import { gsap } from '../lib/motion.js';
@@ -11,6 +11,8 @@ const ARCH_NARROW = 'inset(16% 18% 14% 18% round 600px 600px 18px 18px)';
 /** Pinned hero: the film opens up on load, then narrows into an arch with two close-ups beside it. */
 export default function Hero({ ready, onShop }) {
   const root = useRef(null);
+  // The two close-up films only load and play once the pinned scroll is about to reveal them.
+  const [closeOn, setCloseOn] = useState(false);
 
   // Hidden state before the loader hands over + pinned scroll timeline.
   useLayoutEffect(() => {
@@ -24,7 +26,15 @@ export default function Hero({ ready, onShop }) {
       mm.add({ wide: '(min-width: 700px)', narrow: '(max-width: 699px)' }, ({ conditions }) => {
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
-          scrollTrigger: { trigger: root.current, start: 'top top', end: '+=130%', scrub: 1, pin: true, anticipatePin: 1 },
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top top',
+            end: '+=130%',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            onUpdate: (self) => setCloseOn(self.progress > 0.3 && self.isActive),
+          },
         });
         tl.fromTo('.hero-media', { clipPath: FULL }, { clipPath: conditions.wide ? ARCH_WIDE : ARCH_NARROW, duration: 1 }, 0)
           .fromTo('.hero-film img, .hero-film video', { scale: 1.12 }, { scale: 1, duration: 1 }, 0)
@@ -67,10 +77,10 @@ export default function Hero({ ready, onShop }) {
           </div>
         </div>
         <div className="hero-close hero-close-l" aria-hidden="true">
-          <Film name="hero-close-1" alt="" color="#c2378a" />
+          <Film name="hero-close-1" alt="" color="#c2378a" active={closeOn} />
         </div>
         <div className="hero-close hero-close-r" aria-hidden="true">
-          <Film name="hero-close-2" alt="" color="#f0a21a" />
+          <Film name="hero-close-2" alt="" color="#f0a21a" active={closeOn} />
         </div>
 
         <div className="hero-content">

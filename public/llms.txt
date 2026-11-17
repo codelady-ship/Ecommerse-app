@@ -1,0 +1,62 @@
+# HUELINE Saturation SS27
+
+> A fictional hand-dyed womenswear label, built as a front-end portfolio project by codelady-ship. One page holds a lookbook, a 3D wardrobe ring, a colour story and a filterable shop of 24 pieces; product pages, a bag, saved pieces and a demo checkout complete the flow. Nothing is for sale: no payment is taken and no orders ship.
+
+Built with React, React Router, GSAP (ScrollTrigger, Flip), Lenis and Zustand, with an optional Express + MongoDB API. Without the API the site runs in demo mode on the bundled catalogue and stores the bag and saved pieces in the browser.
+
+## Key pages
+
+- [Home: lookbook, wardrobe, colour story and shop](https://codelady-ship.github.io/Ecommerse-app/)
+- [Shop section](https://codelady-ship.github.io/Ecommerse-app/#shop)
+- [Example product page](https://codelady-ship.github.io/Ecommerse-app/product?code=HL-T-01)
+- [Demo checkout](https://codelady-ship.github.io/Ecommerse-app/checkout)
+- [Source code](https://github.com/codelady-ship/Ecommerse-app)
+
+## Collection (24 pieces, sizes XS-XL, prices in INR for the demo only)
+
+### Tailoring
+
+- Cobalt wrap overcoat (HL-T-01): Cobalt, Double-faced cashmere, ₹62,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-T-01
+- Cobalt trouser suit (HL-T-02): Cobalt, Super 120s wool, ₹54,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-T-02
+- Marigold soft blazer (HL-T-03): Marigold, Linen-silk, 210 g/m², ₹33,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-T-03
+- Chalk belted trench (HL-T-04): Chalk, Cotton gabardine, ₹41,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-T-04
+
+### Streetwear
+
+- Dyed loop-back hoodie (HL-S-01): Lagoon, Organic cotton, 420 g/m², ₹9,800 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-S-01
+- Lagoon fleece set (HL-S-02): Lagoon, Brushed fleece, ₹10,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-S-02
+- Orchid boxy tee (HL-S-03): Orchid, Combed cotton, 240 g/m², ₹4,200 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-S-03
+- Poppy cargo trouser (HL-S-04): Poppy, Ripstop cotton, ₹12,800 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-S-04
+
+### Evening
+
+- Bias-cut slip dress (HL-E-01): Orchid, Mulberry silk, 19 momme, ₹29,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-E-01
+- Cobalt column gown (HL-E-02): Cobalt, Silk crepe de chine, ₹48,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-E-02
+- Orchid halter dress (HL-E-03): Orchid, Silk satin, ₹36,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-E-03
+- Plum draped midi (HL-E-04): Plum, Silk georgette, ₹31,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-E-04
+
+### Knitwear
+
+- Marigold cardigan set (HL-K-01): Marigold, Lambswool, ₹16,800 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-K-01
+- Orchid ribbed crewneck (HL-K-02): Orchid, Merino, 12 gauge, ₹14,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-K-02
+- Lagoon fine-knit polo (HL-K-03): Lagoon, Cotton-silk, ₹11,200 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-K-03
+- Chalk cable vest (HL-K-04): Chalk, Undyed alpaca, ₹13,900 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-K-04
+
+### Resort
+
+- Block-print shirt dress (HL-R-01): Poppy, Hand-block cotton voile, ₹18,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-R-01
+- Marigold tiered sundress (HL-R-02): Marigold, Cotton mulmul, ₹15,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-R-02
+- Lagoon tiered maxi (HL-R-03): Lagoon, Cotton voile, ₹17,200 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-R-03
+- Chalk wide-leg set (HL-R-04): Chalk, Linen, 180 g/m², ₹21,000 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-R-04
+
+### Denim
+
+- Indigo trucker jacket (HL-D-01): Indigo, Indigo + cobalt overdye, ₹17,900 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-D-01
+- Straight selvedge jean (HL-D-02): Indigo, 14 oz selvedge, ₹14,900 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-D-02
+- Rinse wide-leg jean (HL-D-03): Indigo, 12 oz organic denim, ₹13,500 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-D-03
+- Overdyed shirt dress (HL-D-04): Cobalt, Indigo chambray, ₹16,200 - https://codelady-ship.github.io/Ecommerse-app/product?code=HL-D-04
+
+## Notes
+
+- Product pages are client-side routes on GitHub Pages, so only the home page is listed in the sitemap.
+- Photos: CC0 from StockSnap. Films: free clips from Pexels (Pexels License). Credits: https://github.com/codelady-ship/Ecommerse-app/blob/main/docs/CREDITS.md

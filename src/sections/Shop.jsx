@@ -103,8 +103,8 @@ export default function Shop({ style, setStyle }) {
         Showing {shown.size} of {matching.length} pieces
       </p>
       <div className="shop-grid" ref={grid}>
-        {sorted.map((p, i) => (
-          <ProductCard key={p.code} p={p} hidden={!shown.has(p.code)} eager={i < 4} />
+        {sorted.map((p) => (
+          <ProductCard key={p.code} p={p} hidden={!shown.has(p.code)} />
         ))}
       </div>
       {matching.length > PAGE && (

@@ -3,11 +3,11 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { Img } from '../components/Media.jsx';
 import BuyBox from '../components/BuyBox.jsx';
 import ProductCard from '../components/ProductCard.jsx';
-import { src, views } from '../data/catalog.js';
+import { SIZES, src, views } from '../data/catalog.js';
 import { deliveryEstimate } from '../lib/api.js';
 import { inr } from '../lib/format.js';
 import { gsap, revealWithin, scrollToId } from '../lib/motion.js';
-import { useDocumentMeta } from '../lib/meta.js';
+import { absolute, SITE, useDocumentMeta, useJsonLd } from '../lib/meta.js';
 import { bagTotal, useCatalog, useLists } from '../lib/store.js';
 import { FREE_SHIPPING_FROM } from '../../backend/src/lib/delivery.js';
 
@@ -39,7 +39,7 @@ function ZoomView({ v, p, index }) {
       onBlur={() => setZoom(false)}
     >
       <span className="pg-zoom" style={{ transform: zoom ? 'scale(2.2)' : 'scale(1)', transformOrigin: origin }}>
-        <Img name={v.name} alt={`${p.name}, ${v.label.toLowerCase()}`} color={p.colourHex} pos={v.pos} zoom={v.zoom} eager={index === 0} />
+        <Img name={v.name} alt={`${p.name}, ${v.label.toLowerCase()}`} color={p.colourHex} pos={v.pos} zoom={v.zoom} eager={index === 0} priority={index === 0} />
       </span>
     </button>
   );
@@ -145,13 +145,49 @@ export default function Product() {
   const [accent, setAccent] = useState(null);
 
   useDocumentMeta({
-    title: p ? `${p.name} · Hueline Product` : 'Hueline Product',
+    title: p ? `${p.name} · Hueline SS27` : 'Piece not found · Hueline',
     description: p
-      ? `${p.name} in ${p.colour}, ${p.fabric}. ${inr(p.price)}. From the HUELINE Saturation SS27 demo shop.`
-      : 'A product from the HUELINE Saturation SS27 demo shop.',
+      ? `${p.name} in ${p.colour}, ${p.fabric.toLowerCase()}. Hand-dyed ${p.styleLabel.toLowerCase()} from the HUELINE Saturation SS27 lookbook, a fictional portfolio demo shop.`
+      : 'This piece is not in the HUELINE Saturation SS27 collection.',
     path: `/product?code=${code}`,
-    image: p && src(p.images[0]) ? new URL(src(p.images[0]), window.location.origin).href : undefined,
+    image: p ? absolute(src(p.images[0])) : undefined,
+    noindex: !p,
   });
+
+  // Structured data for what this page shows: the piece (no offers or ratings: HUELINE sells nothing)
+  // and the breadcrumb trail above the gallery.
+  useJsonLd(
+    'product',
+    p && {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Product',
+          name: p.name,
+          sku: p.code,
+          description: `${p.name} in ${p.colour}, ${p.fabric}. Available in sizes ${SIZES.join(', ')}.`,
+          color: p.colour,
+          material: p.fabric,
+          category: p.styleLabel,
+          size: SIZES,
+          image: views(p)
+            .filter((v) => v.zoom === 1)
+            .map((v) => absolute(src(v.name)))
+            .filter(Boolean),
+          brand: { '@type': 'Brand', name: 'HUELINE' },
+          url: `${SITE}/product?code=${p.code}`,
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+            { '@type': 'ListItem', position: 2, name: p.styleLabel, item: `${SITE}/#shop` },
+            { '@type': 'ListItem', position: 3, name: p.name },
+          ],
+        },
+      ],
+    },
+  );
 
   useEffect(() => setAccent(null), [code]);
   useEffect(() => {
