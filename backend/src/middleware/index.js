@@ -3,10 +3,11 @@ import { ZodError } from 'zod';
 import { config } from '../config.js';
 
 export class HttpError extends Error {
-  constructor(status, message, details) {
+  constructor(status, message, details, extra) {
     super(message);
     this.status = status;
     this.details = details;
+    this.extra = extra;
   }
 }
 
@@ -32,12 +33,22 @@ export function requireAdmin(req, _res, next) {
   if (!token) return next(new HttpError(401, 'Missing bearer token'));
   try {
     const payload = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] });
-    if (payload.role !== 'admin') throw new Error('not admin');
+    if (payload.role !== 'admin' && payload.role !== 'demo') throw new Error('not admin');
     req.admin = payload;
     next();
   } catch {
     next(new HttpError(401, 'Invalid or expired token'));
   }
+}
+
+export const DEMO_READ_ONLY = 'Demo admin is read-only: changes are not saved.';
+
+/** The public demo admin may read everything but never write. Real admins pass straight through. */
+export function blockDemoWrites(req, _res, next) {
+  if (req.admin?.role === 'demo' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return next(new HttpError(403, DEMO_READ_ONLY, undefined, { demo: true }));
+  }
+  next();
 }
 
 export const notFound = (req, _res, next) => next(new HttpError(404, `No route for ${req.method} ${req.path}`));
@@ -51,6 +62,8 @@ export function errorHandler(err, _req, res, _next) {
     body = { error: 'Validation failed', details: err.issues };
   } else if (err.details) {
     body.details = err.details;
+  } else if (err.extra) {
+    Object.assign(body, err.extra);
   } else if (err.code === 11000) {
     status = 409;
     body = { error: 'Already exists' };

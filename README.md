@@ -84,6 +84,19 @@ echo VITE_API_BASE_URL=http://localhost:4000 > .env.local
   MongoDB Atlas M0 cluster), `ADMIN_EMAIL`, `ADMIN_PASSWORD` and optionally `CLOUDINARY_URL`. The database is seeded on
   first boot. Free Render services sleep when idle; the front end falls back to demo data while the API wakes up.
 
+## Admin panel
+
+[`/admin`](https://codelady-ship.github.io/Ecommerse-app/admin/) is a small back office for the API's admin routes:
+products (search, create, edit, hide, delete), demo orders and newsletter subscribers. It stands alone without the
+shop nav, so it also works inside an iframe, and keeps its JWT in `sessionStorage` (no cookies).
+
+- **Demo admin** button, or `demo@hueline.az` / `demo1234` (public on purpose). The seed creates this account with role
+  `demo`; the API lets it read everything and answers every write with a 403 *Demo admin is read-only*, shown as a
+  toast. `DEMO_ADMIN=off` + re-seed removes it. Real admins (`ADMIN_EMAIL`) keep full rights.
+- **No API?** When `VITE_API_BASE_URL` is empty or the API cannot be reached, the demo login opens an in-browser sandbox
+  built from the bundled catalogue. Edits work but stay in this tab (`sessionStorage`), under a visible
+  *Demo mode — changes are not saved* note with a reset button.
+
 ## Tech stack
 
 React 19 · React Router 7 · Zustand 5 · GSAP 3.12.5 (ScrollTrigger, Flip) · Lenis 1.1.13 · Vite 6 ·

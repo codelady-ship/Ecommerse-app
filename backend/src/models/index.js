@@ -116,6 +116,8 @@ const AdminSchema = new Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
+    // 'demo' = the public portfolio login: it can read everything, every write is refused with a 403.
+    role: { type: String, enum: ['admin', 'demo'], default: 'admin' },
   },
   { timestamps: true, toJSON: { ...json, transform: (d, r) => (delete r.passwordHash, json.transform(d, r)) } },
 );

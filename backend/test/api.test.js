@@ -251,6 +251,36 @@ describe('admin', () => {
     const s = await request(app).get('/api/admin/subscribers').set(auth).expect(200);
     assert.equal(s.body.length, 1);
   });
+
+  test('the seeded demo admin can read but every write is refused', async () => {
+    const { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } = await import('../src/seed.js');
+    const r = await request(app).post('/api/auth/login').send({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }).expect(200);
+    assert.equal(r.body.admin.role, 'demo');
+    const auth = { Authorization: `Bearer ${r.body.token}` };
+    const me = await request(app).get('/api/auth/me').set(auth).expect(200);
+    assert.equal(me.body.role, 'demo');
+    const list = await request(app).get('/api/admin/products').set(auth).expect(200);
+    assert.ok(list.body.length >= 24);
+    await request(app).get('/api/admin/orders').set(auth).expect(200);
+    await request(app).get('/api/admin/subscribers').set(auth).expect(200);
+    const body = { code: 'HL-K-09', name: 'Demo jumper', fabric: 'Wool', price: 100, colour: 'cobalt', style: 'K' };
+    const w = await request(app).post('/api/admin/products').set(auth).send(body).expect(403);
+    assert.equal(w.body.demo, true);
+    assert.match(w.body.error, /read-only/);
+    await request(app).patch('/api/admin/products/HL-T-01').set(auth).send({ price: 1 }).expect(403);
+    await request(app).delete('/api/admin/products/HL-T-01').set(auth).expect(403);
+    await request(app).post('/api/admin/uploads').set(auth).expect(403);
+    const still = await request(app).get('/api/products/HL-T-01').expect(200);
+    assert.notEqual(still.body.product.price, 1);
+  });
+
+  test('seed refuses the demo email as the real admin and DEMO_ADMIN=off removes the demo user', async () => {
+    const { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } = await import('../src/seed.js');
+    await assert.rejects(seedDatabase({ adminEmail: DEMO_ADMIN_EMAIL, adminPassword: 'long-enough-password' }), /demo email/);
+    await seedDatabase({ adminEmail: '', adminPassword: '', demoAdmin: false });
+    await request(app).post('/api/auth/login').send({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }).expect(401);
+    await seedDatabase({ adminEmail: '', adminPassword: '' });
+  });
 });
 
 describe('cors, errors, rate limit', () => {

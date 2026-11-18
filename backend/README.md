@@ -8,9 +8,9 @@ Errors look like `{ "error": "...", "details": [...] }`.
 ```bash
 npm install
 cp .env.example .env    # MONGODB_URI, JWT_SECRET (32+ chars), CORS_ORIGIN, ADMIN_EMAIL, ADMIN_PASSWORD
-npm run seed            # upserts 6 styles, 9 colours, 24 products (+ admin user if set); safe to re-run
+npm run seed            # upserts 6 styles, 9 colours, 24 products, the read-only demo admin (+ admin user if set); safe to re-run
 npm run dev             # node --watch, port 4000
-npm test                # 25 tests, in-memory MongoDB (mongodb-memory-server)
+npm test                # 27 tests, in-memory MongoDB (mongodb-memory-server)
 ```
 
 `npm start` also seeds an empty database on first boot.
@@ -41,6 +41,10 @@ npm test                # 25 tests, in-memory MongoDB (mongodb-memory-server)
 | PATCH / DELETE | `/api/admin/products/:code` | Bearer token |
 | POST | `/api/admin/uploads?code=HL-T-01` | Bearer token, multipart field `image` (JPEG/PNG/WebP/AVIF, ≤2 MB); saved to `UPLOAD_DIR` (served at `/uploads`) or to Cloudinary when `CLOUDINARY_URL` is set; with `code` the URL is appended to that product |
 | GET | `/api/admin/orders`, `/api/admin/subscribers` | Bearer token |
+
+The seed also creates a public **read-only demo admin** (`demo@hueline.az` / `demo1234`, role `demo`) for the portfolio.
+It can call every GET above; every POST / PATCH / DELETE under `/api/admin` answers
+`403 { "error": "Demo admin is read-only: changes are not saved.", "demo": true }`. `DEMO_ADMIN=off` + `npm run seed` removes it.
 
 Example:
 

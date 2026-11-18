@@ -2339,3 +2339,219 @@ select {
 .crumbs a {
   justify-content: center;
 }
+
+/* ---------------------------------------------------------------- admin (/admin)
+   A small back office in the shop's own type and colours. Stands alone without the shop nav, so it also
+   works inside an iframe. Tables scroll inside their own box; every control is at least 44px tall. */
+.adm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-content: start;
+  min-height: 100vh;
+  padding: 24px var(--gutter) 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.adm-login {
+  justify-items: start;
+  padding-top: clamp(32px, 8vh, 96px);
+}
+.adm-login .display {
+  font-family: var(--f-cond);
+  font-stretch: 62%;
+  font-variation-settings: 'wdth' 62;
+  font-weight: 800;
+  font-style: normal;
+  text-transform: uppercase;
+  font-size: clamp(54px, 9vw, 120px);
+  line-height: 0.9;
+}
+.adm-login-form {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+.adm-hint {
+  font-size: 14px;
+  color: var(--mute);
+}
+.adm-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.adm-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font: 800 28px/1 var(--f-cond);
+  margin-right: auto;
+}
+.adm-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.adm-role {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+}
+.adm-btn {
+  min-height: 44px;
+  padding: 0 18px;
+}
+.adm-note {
+  padding: 14px 18px;
+  border: 1px solid var(--marigold);
+  border-left-width: 6px;
+  border-radius: 10px;
+  background: rgba(240, 162, 26, 0.12);
+  font-size: 15px;
+}
+.adm-reset {
+  margin-left: 8px;
+  text-decoration: underline;
+}
+.adm-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.adm-tabs .tab {
+  flex: none;
+  min-height: 44px;
+}
+.adm-count {
+  opacity: 0.7;
+}
+.adm-panel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.adm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.adm-input {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+}
+.adm-toolbar .adm-input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.adm-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.adm-form .wide {
+  grid-column: 1 / -1;
+}
+.adm-form .field input {
+  min-height: 44px;
+}
+.adm-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  align-self: end;
+  font-size: 15px;
+}
+.adm-check input {
+  width: 22px;
+  height: 22px;
+}
+.adm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.adm-table-wrap {
+  position: relative; /* keeps the .sr-only header inside the scroll box */
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.adm-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.adm-table th,
+.adm-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+.adm-table th {
+  font: 500 12px var(--f-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.adm-table tr:last-child td {
+  border-bottom: 0;
+}
+.adm-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.adm-table .mono {
+  font-size: 12px;
+}
+.adm-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: -1px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.adm-row-actions {
+  display: flex;
+  gap: 14px;
+}
+.adm-row-actions .link-btn {
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.adm-danger {
+  color: #b0124f;
+}
+.adm-empty {
+  padding: 24px 0;
+}
+@media (max-width: 599px) {
+  .adm-brand {
+    font-size: 24px;
+  }
+  .adm-toolbar .adm-btn {
+    flex: 1 1 100%;
+  }
+}
