@@ -43,7 +43,8 @@ npm test                # 27 tests, in-memory MongoDB (mongodb-memory-server)
 | GET | `/api/admin/orders`, `/api/admin/subscribers` | Bearer token |
 
 The seed also creates a public **read-only demo admin** (`demo@hueline.az` / `demo1234`, role `demo`) for the portfolio.
-It can call every GET above; every POST / PATCH / DELETE under `/api/admin` answers
+It can call every GET above, but `orders` and `subscribers` come back masked for it (`src/lib/mask.js`: name `R*** V***`, email
+`r***@g***.test`, phone `*** *** **10`, no address, pincode or `sessionId`, plus `masked: true`); every POST / PATCH / DELETE under `/api/admin` answers
 `403 { "error": "Demo admin is read-only: changes are not saved.", "demo": true }`. `DEMO_ADMIN=off` + `npm run seed` removes it.
 
 Example:

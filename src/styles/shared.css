@@ -2537,6 +2537,7 @@ select {
   gap: 14px;
 }
 .adm-row-actions .link-btn {
+  min-width: 44px;
   min-height: 44px;
   text-decoration: underline;
   text-underline-offset: 4px;

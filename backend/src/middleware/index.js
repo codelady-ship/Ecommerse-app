@@ -43,7 +43,7 @@ export function requireAdmin(req, _res, next) {
 
 export const DEMO_READ_ONLY = 'Demo admin is read-only: changes are not saved.';
 
-/** The public demo admin may read everything but never write. Real admins pass straight through. */
+/** The public demo admin may read (personal data masked in routes/admin.js) but never write. Real admins pass straight through. */
 export function blockDemoWrites(req, _res, next) {
   if (req.admin?.role === 'demo' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     return next(new HttpError(403, DEMO_READ_ONLY, undefined, { demo: true }));

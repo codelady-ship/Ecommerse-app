@@ -101,7 +101,7 @@ function Login({ onSession }) {
           Demo admin
         </button>
         <p className="adm-hint">
-          Demo login: <span translate="no">{DEMO_EMAIL}</span> / <span translate="no">{DEMO_PASSWORD}</span>. It is read-only.
+          Demo login: <span translate="no">{DEMO_EMAIL}</span> / <span translate="no">{DEMO_PASSWORD}</span>. It is read-only and sees customer details masked.
         </p>
       </form>
       <Link className="link-btn mono-label" to="/">
@@ -166,7 +166,7 @@ function Dashboard({ session, onSession, onLogout }) {
         </h1>
         <p className="adm-who mono-label">
           <span translate="no">{session.email}</span>
-          <span className="adm-role">{isDemo ? 'demo · read-only' : 'admin'}</span>
+          <span className="adm-role">{session.sandbox ? 'demo · sandbox' : isDemo ? 'demo · read-only' : 'admin'}</span>
         </p>
         <button type="button" className="btn btn-line adm-btn" onClick={onLogout}>
           Sign out
@@ -192,7 +192,7 @@ function Dashboard({ session, onSession, onLogout }) {
       ) : (
         isDemo && (
           <p className="adm-note" role="note">
-            <strong>Demo admin — read-only.</strong> You are looking at the live API. The server refuses every change from this account.
+            <strong>Demo admin — read-only.</strong> You are looking at the live API. The server refuses every change from this account and masks customers' names, emails, phones and addresses.
           </p>
         )
       )}

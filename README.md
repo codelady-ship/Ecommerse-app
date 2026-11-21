@@ -91,7 +91,8 @@ products (search, create, edit, hide, delete), demo orders and newsletter subscr
 shop nav, so it also works inside an iframe, and keeps its JWT in `sessionStorage` (no cookies).
 
 - **Demo admin** button, or `demo@hueline.az` / `demo1234` (public on purpose). The seed creates this account with role
-  `demo`; the API lets it read everything and answers every write with a 403 *Demo admin is read-only*, shown as a
+  `demo`; the API lets it read the catalogue, returns orders and subscribers with every personal field masked
+  (`R*** V***`, `r***@g***.test`, no address, pincode or session id) and answers every write with a 403 *Demo admin is read-only*, shown as a
   toast. `DEMO_ADMIN=off` + re-seed removes it. Real admins (`ADMIN_EMAIL`) keep full rights.
 - **No API?** When `VITE_API_BASE_URL` is empty or the API cannot be reached, the demo login opens an in-browser sandbox
   built from the bundled catalogue. Edits work but stay in this tab (`sessionStorage`), under a visible

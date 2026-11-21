@@ -7,6 +7,7 @@ import { config } from '../config.js';
 import { Admin, Category, Colour, Order, Product, Subscriber } from '../models/index.js';
 import { HttpError, blockDemoWrites, requireAdmin, validate } from '../middleware/index.js';
 import { ALLOWED_TYPES, saveImage } from '../lib/storage.js';
+import { maskOrder, maskSubscriber } from '../lib/mask.js';
 
 // ---------- auth ----------
 export const auth = Router();
@@ -113,10 +114,16 @@ admin.post('/uploads', upload.single('image'), async (req, res) => {
   res.status(201).json({ ...saved, product });
 });
 
-admin.get('/orders', async (_req, res) => {
-  res.json(await Order.find().sort({ createdAt: -1 }).limit(100));
+// Orders and subscribers hold visitors' personal data. The demo admin's password is public, so that role
+// only ever gets the masked shape from lib/mask.js; only a real admin gets the documents as stored.
+const isDemo = (req) => req.admin?.role !== 'admin';
+
+admin.get('/orders', async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 }).limit(100);
+  res.json(isDemo(req) ? orders.map(maskOrder) : orders);
 });
 
-admin.get('/subscribers', async (_req, res) => {
-  res.json(await Subscriber.find().sort({ createdAt: -1 }).limit(500));
+admin.get('/subscribers', async (req, res) => {
+  const subscribers = await Subscriber.find().sort({ createdAt: -1 }).limit(500);
+  res.json(isDemo(req) ? subscribers.map(maskSubscriber) : subscribers);
 });
