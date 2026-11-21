@@ -1,0 +1,125 @@
+/* HUELINE admin — Tailwind v4 + shadcn/ui, loaded only with the lazy /admin chunk.
+
+   Nothing here may reach the public shop:
+   - no Tailwind preflight (the shop's own base rules in styles/shared.css stay the only reset);
+   - every utility carries the `tw:` prefix and every theme variable the `--tw-` prefix, so no class or
+     custom property can collide with the shop's;
+   - utilities are generated from src/admin and src/pages/Admin.jsx only;
+   - the few hand-written rules are scoped to .hl-admin (the panel root, also set on its portal container)
+     or to html.hl-admin-page (set while the panel is mounted, removed when it unmounts).
+
+   Utilities are deliberately NOT in a cascade layer: shared.css is unlayered, and layered rules would lose
+   to its global `button`, `input` and `:focus-visible` rules. */
+@layer theme;
+@import 'tailwindcss/theme.css' layer(theme) prefix(tw);
+@import 'tailwindcss/utilities.css' prefix(tw) source(none);
+@source './';
+@source '../pages/Admin.jsx';
+
+@theme {
+  /* HUELINE tokens (same values as :root in styles/shared.css) */
+  --color-ink: #16141a;
+  --color-paper: #eceef2;
+  --color-mute: #5f5c68;
+  --color-cobalt: #2b3fd6;
+  --color-cobalt-deep: #1f2fae;
+  --color-marigold: #f0a21a;
+  --color-orchid: #c2378a;
+  --color-lagoon: #0f6f6a;
+  --color-danger: #b0124f;
+  --color-danger-deep: #8f0c3f;
+  /* admin surfaces on white */
+  --color-wash: #f5f6f8;
+  --color-line: #e2e3e8;
+  --color-line-strong: #85828f;
+
+  --font-ui: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --ease-hl: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-hl-fade-in: hl-adm-fade-in 0.2s var(--ease-hl);
+  --animate-hl-fade-out: hl-adm-fade-out 0.15s ease-in forwards;
+  --animate-hl-pop-in: hl-adm-pop-in 0.25s var(--ease-hl);
+  --animate-hl-pop-out: hl-adm-pop-out 0.15s ease-in forwards;
+  --animate-hl-rise-in: hl-adm-rise-in 0.3s var(--ease-hl);
+  --animate-hl-pulse: hl-adm-pulse 1.6s ease-in-out infinite;
+
+  @keyframes hl-adm-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes hl-adm-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes hl-adm-pop-in {
+    from {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+  @keyframes hl-adm-pop-out {
+    to {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+  @keyframes hl-adm-rise-in {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+  @keyframes hl-adm-pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+}
+
+/* White page while the panel is mounted (the shop's body is --paper). The site is light-only
+   (color-scheme: light on :root), so this stays white when the OS is in dark mode too. */
+html.hl-admin-page,
+html.hl-admin-page body {
+  background: #fff;
+}
+/* Radix locks scroll by padding <body> for the scrollbar; here the page scroller is <html> (shared.css
+   sets overflow-x: clip on it), so the scrollbar never goes away and the padding would only shift the page. */
+html.hl-admin-page body[data-scroll-locked] {
+  overflow: visible !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+.hl-admin {
+  font-family: var(--tw-font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tw-color-ink);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+.hl-admin table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.hl-admin input::placeholder {
+  color: var(--tw-color-mute);
+  opacity: 1;
+}
+.hl-admin input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hl-admin *,
+  .hl-admin *::before,
+  .hl-admin *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Nav from './components/Nav.jsx';
 import Footer from './components/Footer.jsx';
@@ -8,9 +8,11 @@ import Home from './pages/Home.jsx';
 import Product from './pages/Product.jsx';
 import Checkout from './pages/Checkout.jsx';
 import NotFound from './pages/NotFound.jsx';
-import Admin from './pages/Admin.jsx';
 import { initLenis, ScrollTrigger, scrollToTop } from './lib/motion.js';
 import { startListSync, useCatalog, useUI } from './lib/store.js';
+
+// The admin panel (Tailwind + shadcn/ui with its own stylesheet) is a separate chunk: shop pages never load it.
+const Admin = lazy(() => import('./pages/Admin.jsx'));
 
 export default function App() {
   const { pathname, search } = useLocation();
@@ -43,12 +45,11 @@ export default function App() {
   // The admin panel stands alone (no shop nav, footer or custom cursor), so it also fits an iframe.
   if (/^\/admin\/?$/.test(pathname)) {
     return (
-      <>
-        <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1}>
+        <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#fff' }} role="status" aria-label="Loading…" />}>
           <Admin />
-        </main>
-        <Toast />
-      </>
+        </Suspense>
+      </main>
     );
   }
 
