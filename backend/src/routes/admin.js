@@ -5,8 +5,9 @@ import multer from 'multer';
 import { z } from 'zod';
 import { config } from '../config.js';
 import { Admin, Category, Colour, Order, Product, Subscriber } from '../models/index.js';
-import { HttpError, requireAdmin, validate } from '../middleware/index.js';
+import { HttpError, blockDemoWrites, requireAdmin, validate } from '../middleware/index.js';
 import { ALLOWED_TYPES, saveImage } from '../lib/storage.js';
+import { maskOrder, maskSubscriber } from '../lib/mask.js';
 
 // ---------- auth ----------
 export const auth = Router();
@@ -21,11 +22,12 @@ auth.post(
     // Compare against a dummy hash when the user is unknown so timing does not reveal valid emails.
     const ok = await bcrypt.compare(password, admin?.passwordHash || DUMMY_HASH);
     if (!admin || !ok) throw new HttpError(401, 'Wrong email or password');
-    const token = jwt.sign({ sub: String(admin._id), email: admin.email, role: 'admin' }, config.jwtSecret, {
+    const role = admin.role === 'demo' ? 'demo' : 'admin';
+    const token = jwt.sign({ sub: String(admin._id), email: admin.email, role }, config.jwtSecret, {
       algorithm: 'HS256',
       expiresIn: config.jwtExpiresIn,
     });
-    res.json({ token, admin: { email: admin.email } });
+    res.json({ token, admin: { email: admin.email, role } });
   },
 );
 
@@ -33,7 +35,7 @@ auth.get('/me', requireAdmin, (req, res) => res.json({ email: req.admin.email, r
 
 // ---------- admin CRUD ----------
 export const admin = Router();
-admin.use(requireAdmin);
+admin.use(requireAdmin, blockDemoWrites);
 
 const image = z.string().trim().max(500).regex(/^(https:\/\/|\/uploads\/|[a-z0-9-]+$)/, 'Use an https URL, an /uploads/ path or an asset name');
 const productBody = z.object({
@@ -112,10 +114,16 @@ admin.post('/uploads', upload.single('image'), async (req, res) => {
   res.status(201).json({ ...saved, product });
 });
 
-admin.get('/orders', async (_req, res) => {
-  res.json(await Order.find().sort({ createdAt: -1 }).limit(100));
+// Orders and subscribers hold visitors' personal data. The demo admin's password is public, so that role
+// only ever gets the masked shape from lib/mask.js; only a real admin gets the documents as stored.
+const isDemo = (req) => req.admin?.role !== 'admin';
+
+admin.get('/orders', async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 }).limit(100);
+  res.json(isDemo(req) ? orders.map(maskOrder) : orders);
 });
 
-admin.get('/subscribers', async (_req, res) => {
-  res.json(await Subscriber.find().sort({ createdAt: -1 }).limit(500));
+admin.get('/subscribers', async (req, res) => {
+  const subscribers = await Subscriber.find().sort({ createdAt: -1 }).limit(500);
+  res.json(isDemo(req) ? subscribers.map(maskSubscriber) : subscribers);
 });

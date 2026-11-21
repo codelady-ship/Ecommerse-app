@@ -251,6 +251,119 @@ describe('admin', () => {
     const s = await request(app).get('/api/admin/subscribers').set(auth).expect(200);
     assert.equal(s.body.length, 1);
   });
+
+  test('the seeded demo admin can read but every write is refused', async () => {
+    const { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } = await import('../src/seed.js');
+    const r = await request(app).post('/api/auth/login').send({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }).expect(200);
+    assert.equal(r.body.admin.role, 'demo');
+    const auth = { Authorization: `Bearer ${r.body.token}` };
+    const me = await request(app).get('/api/auth/me').set(auth).expect(200);
+    assert.equal(me.body.role, 'demo');
+    const list = await request(app).get('/api/admin/products').set(auth).expect(200);
+    assert.ok(list.body.length >= 24);
+    await request(app).get('/api/admin/orders').set(auth).expect(200);
+    await request(app).get('/api/admin/subscribers').set(auth).expect(200);
+    const body = { code: 'HL-K-09', name: 'Demo jumper', fabric: 'Wool', price: 100, colour: 'cobalt', style: 'K' };
+    const w = await request(app).post('/api/admin/products').set(auth).send(body).expect(403);
+    assert.equal(w.body.demo, true);
+    assert.match(w.body.error, /read-only/);
+    await request(app).patch('/api/admin/products/HL-T-01').set(auth).send({ price: 1 }).expect(403);
+    await request(app).delete('/api/admin/products/HL-T-01').set(auth).expect(403);
+    await request(app).post('/api/admin/uploads').set(auth).expect(403);
+    const still = await request(app).get('/api/products/HL-T-01').expect(200);
+    assert.notEqual(still.body.product.price, 1);
+  });
+
+  test('the demo admin never receives a real personal value from any admin GET', async () => {
+    const { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } = await import('../src/seed.js');
+    const visitorSid = crypto.randomUUID();
+    const real = {
+      name: 'Zarina Qurbanova',
+      email: 'zarina.qurbanova@privatemail.test',
+      phone: '+91 91234 56780',
+      address: '47 Hidden Courtyard, Flat 9',
+      city: 'Jaipur',
+      pincode: '302017',
+    };
+    const subscriber = 'quiet.reader@familyname.test';
+    const placed = await request(app)
+      .post('/api/orders')
+      .send({ sessionId: visitorSid, items: [{ code: 'HL-S-03', size: 'S', qty: 1 }], customer: real })
+      .expect(201);
+    await request(app).post('/api/newsletter').send({ email: subscriber }).expect(201);
+
+    const login = await request(app).post('/api/auth/login').send({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }).expect(200);
+    const demo = { Authorization: `Bearer ${login.body.token}` };
+
+    // Every value a visitor typed in the tests above, plus the session id that opens GET /api/orders/:number.
+    const secrets = [
+      real.name, 'Zarina', 'Qurbanova', real.email, 'privatemail', real.phone, '9123456780', real.address, 'Hidden Courtyard', real.pincode,
+      visitorSid, sid,
+      'Asha Rao', 'asha@example.com', '+91 98765 43210', '12 MI Road', '302001',
+      subscriber, 'quiet.reader', 'familyname', 'reader@example.com',
+    ];
+    for (const path of ['/api/admin/products', '/api/admin/orders', '/api/admin/subscribers', '/api/auth/me']) {
+      const r = await request(app).get(path).set(demo).expect(200);
+      const text = JSON.stringify(r.body);
+      const digits = text.replace(/[^\d"]/g, '');
+      for (const s of secrets) assert.ok(!text.toLowerCase().includes(s.toLowerCase()), `${path} leaks "${s}" to the demo admin`);
+      assert.ok(!digits.includes('9123456780') && !digits.includes('9876543210'), `${path} leaks a phone number to the demo admin`);
+    }
+
+    const orders = (await request(app).get('/api/admin/orders').set(demo).expect(200)).body;
+    const mine = orders.find((o) => o.number === placed.body.number);
+    assert.deepEqual(mine.customer, {
+      name: 'Z*** Q***',
+      email: 'z***@p***.test',
+      phone: '*** *** **80',
+      address: '(hidden in demo)',
+      city: 'Jaipur',
+      pincode: '******',
+    });
+    assert.equal(mine.masked, true);
+    assert.equal(mine.total, placed.body.total);
+    assert.ok(orders.every((o) => o.masked === true && !('sessionId' in o)));
+    // Nothing in the demo response opens the public order lookup.
+    for (const o of orders) {
+      for (const guess of [o.id, o.number]) await request(app).get(`/api/orders/${o.number}?sessionId=${guess}`).expect((res) => assert.notEqual(res.status, 200));
+    }
+    const subs = (await request(app).get('/api/admin/subscribers').set(demo).expect(200)).body;
+    assert.ok(subs.length >= 2 && subs.every((s) => s.masked === true && /^.\*\*\*@.\*\*\*\.test$|^.\*\*\*@.\*\*\*\.com$/.test(s.email)));
+
+    // The real admin still gets everything as stored.
+    const full = { Authorization: `Bearer ${token}` };
+    const all = (await request(app).get('/api/admin/orders').set(full).expect(200)).body;
+    const same = all.find((o) => o.number === placed.body.number);
+    assert.deepEqual(same.customer, real);
+    assert.equal(same.sessionId, visitorSid);
+    const realSubs = (await request(app).get('/api/admin/subscribers').set(full).expect(200)).body;
+    assert.ok(realSubs.some((s) => s.email === subscriber));
+  });
+
+  test('a token whose role is not exactly "admin" gets the masked shape', async () => {
+    const jwt = (await import('jsonwebtoken')).default;
+    const odd = jwt.sign({ sub: 'x', email: 'x@example.com', role: 'demo' }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '5m' });
+    const r = await request(app).get('/api/admin/subscribers').set('Authorization', `Bearer ${odd}`).expect(200);
+    assert.ok(r.body.every((s) => s.masked === true));
+  });
+
+  test('mask helpers', async () => {
+    const { maskName, maskEmail, maskPhone } = await import('../src/lib/mask.js');
+    assert.equal(maskName('  real   visitor '), 'R*** V***');
+    assert.equal(maskName(''), '***');
+    assert.equal(maskEmail('Real.Visitor@Gmail.test'), 'r***@g***.test');
+    assert.equal(maskEmail('nonsense'), '***');
+    assert.equal(maskPhone('+91 98765 43210'), '*** *** **10');
+    assert.equal(maskPhone('12'), '***');
+  });
+
+  test('seed refuses the demo email as the real admin and DEMO_ADMIN=off removes the demo user', async () => {
+    const { DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } = await import('../src/seed.js');
+    await assert.rejects(seedDatabase({ adminEmail: DEMO_ADMIN_EMAIL, adminPassword: 'long-enough-password' }), /demo email/);
+    await seedDatabase({ adminEmail: '', adminPassword: '', demoAdmin: false });
+    await request(app).post('/api/auth/login').send({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }).expect(401);
+    await seedDatabase({ adminEmail: '', adminPassword: '' });
+  });
 });
 
 describe('cors, errors, rate limit', () => {

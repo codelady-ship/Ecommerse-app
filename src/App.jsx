@@ -8,6 +8,7 @@ import Home from './pages/Home.jsx';
 import Product from './pages/Product.jsx';
 import Checkout from './pages/Checkout.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Admin from './pages/Admin.jsx';
 import { initLenis, ScrollTrigger, scrollToTop } from './lib/motion.js';
 import { startListSync, useCatalog, useUI } from './lib/store.js';
 
@@ -38,6 +39,18 @@ export default function App() {
     const t = setTimeout(() => ScrollTrigger.refresh(), 300);
     return () => clearTimeout(t);
   }, [pathname, search]);
+
+  // The admin panel stands alone (no shop nav, footer or custom cursor), so it also fits an iframe.
+  if (/^\/admin\/?$/.test(pathname)) {
+    return (
+      <>
+        <main id="main" tabIndex={-1}>
+          <Admin />
+        </main>
+        <Toast />
+      </>
+    );
+  }
 
   return (
     <>
