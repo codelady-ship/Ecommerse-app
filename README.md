@@ -45,6 +45,7 @@ src/                      React 19 + Vite app (GitHub Pages)
   lib/store.js            Zustand: catalogue, bag + saved (localStorage, synced to the API), overlays
   lib/motion.js           GSAP, ScrollTrigger, Flip, Lenis setup and reveal helpers
   sections/ pages/ components/
+  admin/                  admin-only: admin.css (Tailwind v4, `tw:` prefix), ui/ (shadcn/ui components), lib/
 backend/                  Express 5 + Mongoose API (Render)
   src/data/catalog.json   the 24 products, 6 styles, 9 colours: single source for the seed AND the front end
   src/lib/delivery.js     delivery rules, shared with the front end
@@ -90,6 +91,11 @@ echo VITE_API_BASE_URL=http://localhost:4000 > .env.local
 products (search, create, edit, hide, delete), demo orders and newsletter subscribers. It stands alone without the
 shop nav, so it also works inside an iframe, and keeps its JWT in `sessionStorage` (no cookies).
 
+The panel is built with [shadcn/ui](https://ui.shadcn.com) components (Radix primitives, `src/admin/ui`) and Tailwind CSS v4 on a
+white page, in HUELINE's own fonts and dyes. It is a lazy chunk with its own stylesheet (`src/admin/admin.css`): no
+Tailwind preflight, every utility prefixed `tw:`, so the shop's pages and CSS are not touched and never load it.
+Dialogs, selects and toasts are in-page (no `window.confirm()`), so they work in a sandboxed iframe.
+
 - **Demo admin** button, or `demo@hueline.az` / `demo1234` (public on purpose). The seed creates this account with role
   `demo`; the API lets it read the catalogue, returns orders and subscribers with every personal field masked
   (`R*** V***`, `r***@g***.test`, no address, pincode or session id) and answers every write with a 403 *Demo admin is read-only*, shown as a
@@ -101,6 +107,7 @@ shop nav, so it also works inside an iframe, and keeps its JWT in `sessionStorag
 ## Tech stack
 
 React 19 · React Router 7 · Zustand 5 · GSAP 3.12.5 (ScrollTrigger, Flip) · Lenis 1.1.13 · Vite 6 ·
+Tailwind CSS 4 + shadcn/ui + Radix (admin panel only) ·
 Node 22 · Express 5 · Mongoose 8 · zod · JWT · multer · helmet · express-rate-limit · node:test + supertest ·
 GitHub Actions · GitHub Pages · Render
 
