@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Only the root is listed on purpose. GitHub Pages serves the deep SPA routes (/product?code=..., /checkout)
-     through 404.html, so they answer with HTTP 404 and cannot be indexed. The 24 pieces are described on the
-     home page itself (shop section + ItemList JSON-LD) and listed with their links in /llms.txt. -->
+<!-- Only the root is listed. The deep routes answer HTTP 200 since the build writes product.html, checkout.html
+     and admin.html (scripts/postbuild.mjs), but /checkout and /admin are noindex and every piece shares one
+     product.html shell (/product?code=...). The 24 pieces are described on the home page itself (shop section +
+     ItemList JSON-LD) and listed with their links in /llms.txt. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://codelady-ship.github.io/Ecommerse-app/</loc>
