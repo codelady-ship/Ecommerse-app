@@ -4,7 +4,16 @@ export const SITE = 'https://codelady-ship.github.io/Ecommerse-app';
 const DEFAULT_IMAGE = `${SITE}/og-image.jpg`;
 
 function setMeta(selector, attr, value) {
-  const el = document.head.querySelector(selector);
+  let el = document.head.querySelector(selector);
+  // The prerendered product shell (dist/product.html) serves every piece, so it ships without a static
+  // canonical and og:url: add them here.
+  if (!el && selector === 'link[rel="canonical"]') {
+    el = document.head.appendChild(document.createElement('link'));
+    el.setAttribute('rel', 'canonical');
+  } else if (!el && selector === 'meta[property="og:url"]') {
+    el = document.head.appendChild(document.createElement('meta'));
+    el.setAttribute('property', 'og:url');
+  }
   if (el) el.setAttribute(attr, value);
 }
 
